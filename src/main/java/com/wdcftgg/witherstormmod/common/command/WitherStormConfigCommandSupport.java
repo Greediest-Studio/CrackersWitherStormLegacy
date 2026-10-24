@@ -33,13 +33,13 @@ final class WitherStormConfigCommandSupport {
                 "witherStormInvulnerability", "smartBossbar", "randomBowelsEntrance",
                 "summoningDimensionListMode",
                 "crossbowsSupportEnderPearls", "preventWitherStormCamping",
-                "bowelsFallResistance", "resummonedPhase", "canAttackHeads",
+                "bowelsFallResistance", "canAttackHeads",
                 "endOfPhaseFiveBombableExclusively",
                 "shouldPlayGlobalSoundsCrossDimensionally", "onlyTryPickingUpTractorTagged",
                 "constantBlackhole", "instantChomp", "healFromChomp");
         register("server.ultimate_target_logic", "ultimateTargetingType",
                 "farthestTargetingTime", "randomizedTargetingTime",
-                "randomlySpeedUpWithTargetChange", "amuletOverride",
+                "randomlySpeedUpWithTargetChange",
                 "maxRandomStrollTargetingTypeRadius", "ignoreUltimateTargetIfHidden",
                 "witherStormsFollowBiggerStorms");
         register("server.ultimate_target_logic.chases", "shouldChaseWhenTargetStopped",

@@ -6,13 +6,50 @@ import com.google.gson.JsonParser;
 import com.wdcftgg.witherstormmod.common.init.ModRegistryNames;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 final class LanguageResourceConverter {
 
     private static final String PREFIX = "assets/witherstormmod/lang/";
+    private static final Set<String> REMOVED_ADVANCEMENTS = Collections.unmodifiableSet(
+            new HashSet<String>(Arrays.asList(
+                    "amulet",
+                    "fully_link_amulet",
+                    "activate_super_beacon",
+                    "resummon_wither_storm",
+                    "resummon_withered_symbiont",
+                    "summon_mob_withered_beacon",
+                    "spyglass_at_wither_storm",
+                    "insane_dedication",
+                    "overly_dedicated")));
+    private static final Set<String> REMOVED_CONFIG_KEYS = Collections.unmodifiableSet(
+            new HashSet<String>(Arrays.asList(
+                    "autoSpawnWitherStorm",
+                    "generateSpawnPlatform",
+                    "allowSuperBeaconResummoning",
+                    "autoSpawnTime",
+                    "resummonedPhase",
+                    "amuletOverride")));
+    private static final Set<String> REMOVED_POTION_KEYS = Collections.unmodifiableSet(
+            new HashSet<String>(Arrays.asList(
+                    "item.minecraft.potion.effect.wither",
+                    "item.minecraft.potion.effect.long_wither",
+                    "item.minecraft.potion.effect.strong_wither",
+                    "item.minecraft.splash_potion.effect.wither",
+                    "item.minecraft.splash_potion.effect.long_wither",
+                    "item.minecraft.splash_potion.effect.strong_wither",
+                    "item.minecraft.lingering_potion.effect.wither",
+                    "item.minecraft.lingering_potion.effect.long_wither",
+                    "item.minecraft.lingering_potion.effect.strong_wither",
+                    "item.minecraft.tipped_arrow.effect.wither",
+                    "item.minecraft.tipped_arrow.effect.long_wither",
+                    "item.minecraft.tipped_arrow.effect.strong_wither")));
 
     private LanguageResourceConverter() {
     }
@@ -48,10 +85,12 @@ final class LanguageResourceConverter {
                 new String(source, StandardCharsets.UTF_8)).getAsJsonObject();
         LinkedHashMap<String, String> converted = new LinkedHashMap<String, String>();
         for (Map.Entry<String, JsonElement> entry : translations.entrySet()) {
+            if (isRemovedTranslationKey(entry.getKey())) continue;
             converted.put(entry.getKey(), entry.getValue().getAsString());
         }
         for (Map.Entry<String, JsonElement> entry : translations.entrySet()) {
             String key = entry.getKey();
+            if (isRemovedTranslationKey(key)) continue;
             String legacyKey = null;
             if (key.startsWith("item.witherstormmod.")) {
                 legacyKey = "item." + key.substring("item.witherstormmod.".length()) + ".name";
@@ -83,6 +122,60 @@ final class LanguageResourceConverter {
                     upstream == null ? "Cracker's Wither Storm Legacy" : upstream);
         }
         return converted;
+    }
+
+    private static boolean isRemovedTranslationKey(String key) {
+        if (REMOVED_POTION_KEYS.contains(key)) {
+            return true;
+        }
+        if (key.startsWith("block.witherstormmod.")) {
+            String rest = key.substring("block.witherstormmod.".length());
+            int dot = rest.indexOf('.');
+            String blockName = dot < 0 ? rest : rest.substring(0, dot);
+            return !ModRegistryNames.isRegisteredBlockName(blockName);
+        }
+        if (key.startsWith("item.witherstormmod.")) {
+            String rest = key.substring("item.witherstormmod.".length());
+            if (rest.endsWith("_spawn_egg")) {
+                return false;
+            }
+            int dot = rest.indexOf('.');
+            String itemName = dot < 0 ? rest : rest.substring(0, dot);
+            if ("iron_command_tool".equals(itemName)) {
+                return true;
+            }
+            return !ModRegistryNames.isRegisteredItemName(itemName);
+        }
+        if (key.startsWith("container.witherstormmod.super_beacon")
+                || key.startsWith("container.witherstormmod.super_support_beacon")
+                || key.startsWith("gui.witherstormmod.button.select")
+                || key.startsWith("gui.witherstormmod.button.showArea")
+                || key.startsWith("gui.witherstormmod.jei.")
+                || key.startsWith("jei.witherstormmod.")
+                || key.startsWith("stat.witherstormmod.")) {
+            return true;
+        }
+        if (key.startsWith("subtitles.witherstormmod.")) {
+            String sound = key.substring("subtitles.witherstormmod.".length());
+            return !ModRegistryNames.isRegisteredSoundName(sound);
+        }
+        if (key.startsWith("witherstormmod.subtitle.")) {
+            String sound = key.substring("witherstormmod.subtitle.".length());
+            return !ModRegistryNames.isRegisteredSoundName(sound);
+        }
+        if (key.startsWith("advancements.witherstormmod.main.")) {
+            String rest = key.substring("advancements.witherstormmod.main.".length());
+            int dot = rest.indexOf('.');
+            String adv = dot < 0 ? rest : rest.substring(0, dot);
+            return REMOVED_ADVANCEMENTS.contains(adv);
+        }
+        if (key.startsWith("gui.witherstormmod.config.")) {
+            String rest = key.substring("gui.witherstormmod.config.".length());
+            int dot = rest.indexOf('.');
+            String cfg = dot < 0 ? rest : rest.substring(0, dot);
+            return REMOVED_CONFIG_KEYS.contains(cfg);
+        }
+        return false;
     }
 
     private static void addRegisteredFallbacks(LinkedHashMap<String, String> target,

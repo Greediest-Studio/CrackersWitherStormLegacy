@@ -1,6 +1,5 @@
 package com.wdcftgg.witherstormmod.common.entity;
 
-import com.wdcftgg.witherstormmod.Tags;
 import com.wdcftgg.witherstormmod.common.config.WitherStormConfig;
 import com.wdcftgg.witherstormmod.common.util.StormDiagnosticLogger;
 import com.wdcftgg.witherstormmod.common.init.ModItems;
@@ -21,12 +20,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.util.EnumParticleTypes;
@@ -257,11 +254,8 @@ public final class SymbiontSummoningManager {
     }
 
     private static boolean isCommandBlockTool(ItemStack stack) {
-        ResourceLocation name = stack.getItem().getRegistryName();
-        if (name == null || !Tags.MOD_ID.equals(name.getNamespace())) return false;
-        String path = name.getPath();
-        return path.contains("command_block_") && (path.endsWith("_sword") || path.endsWith("_pickaxe")
-                || path.endsWith("_axe") || path.endsWith("_shovel") || path.endsWith("_hoe"));
+        return stack != null
+                && com.wdcftgg.witherstormmod.api.common.registry.CommandBlockTools.contains(stack);
     }
 
     public int getSummoningDelay() {

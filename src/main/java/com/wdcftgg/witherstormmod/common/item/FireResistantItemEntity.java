@@ -1,5 +1,7 @@
 package com.wdcftgg.witherstormmod.common.item;
 
+import com.wdcftgg.witherstormmod.Tags;
+import com.wdcftgg.witherstormmod.api.common.registry.CommandBlockTools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
@@ -20,35 +22,31 @@ public class FireResistantItemEntity extends EntityItem {
     }
 
     public static boolean isFireResistant(ItemStack stack) {
-        if (stack == null || stack.isEmpty() || !isLegacyItemImplementation(stack.getItem())) {
+        if (stack == null || stack.isEmpty()) {
             return false;
         }
+        if (CommandBlockTools.contains(stack)) {
+            return true;
+        }
         Item item = stack.getItem();
+        if (!isLegacyItemImplementation(item)) {
+            return false;
+        }
         ResourceLocation registryName = item.getRegistryName();
         if (registryName == null && item instanceof ItemBlock) {
             registryName = ((ItemBlock) item).getBlock().getRegistryName();
         }
-        if (registryName == null) return false;
+        if (registryName == null || !Tags.MOD_ID.equals(registryName.getNamespace())) return false;
         String name = registryName.getPath();
-        return "amulet".equals(name)
-                || "command_block_book".equals(name)
+        return "command_block_book".equals(name)
                 || "withered_nether_star".equals(name)
-                || "eye_of_the_storm".equals(name)
-                || "formidibomb".equals(name)
-                || "super_beacon".equals(name)
-                || "super_support_beacon".equals(name)
-                || name.contains("command_block_");
+                || "formidibomb".equals(name);
     }
 
     private static boolean isLegacyItemImplementation(Item item) {
-        return item instanceof AmuletItem
-                || item instanceof SimpleItem
+        return item instanceof SimpleItem
                 || item instanceof RarityBlockItem
-                || item instanceof CommandBlockSwordItem
-                || item instanceof CommandBlockPickaxeItem
-                || item instanceof CommandBlockAxeItem
-                || item instanceof CommandBlockShovelItem
-                || item instanceof CommandBlockHoeItem;
+                || item instanceof FormidibombItem;
     }
 
     public static Entity create(World world, Entity location, ItemStack stack) {
@@ -66,13 +64,9 @@ public class FireResistantItemEntity extends EntityItem {
 
     private static boolean isInvulnerableExceptToBypassDamage(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;
-        Item item = stack.getItem();
-        if (item instanceof CommandBlockSwordItem
-                || item instanceof CommandBlockPickaxeItem
-                || item instanceof CommandBlockAxeItem
-                || item instanceof CommandBlockShovelItem
-                || item instanceof CommandBlockHoeItem) return true;
-        ResourceLocation name = item.getRegistryName();
-        return name != null && "withered_nether_star".equals(name.getPath());
+        if (CommandBlockTools.contains(stack)) return true;
+        ResourceLocation name = stack.getItem().getRegistryName();
+        return name != null && Tags.MOD_ID.equals(name.getNamespace())
+                && "withered_nether_star".equals(name.getPath());
     }
 }

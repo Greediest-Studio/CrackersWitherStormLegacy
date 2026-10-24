@@ -5,13 +5,7 @@ import com.wdcftgg.witherstormmod.WitherStormMod;
 import com.wdcftgg.witherstormmod.common.resource.UpstreamResourceArchive;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockButton;
-import net.minecraft.block.BlockLadder;
 import net.minecraft.block.BlockLeaves;
-import net.minecraft.block.BlockPressurePlate;
-import net.minecraft.block.BlockRailBase;
-import net.minecraft.block.BlockSign;
-import net.minecraft.block.BlockTorch;
-import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -43,8 +37,6 @@ import java.util.Map;
 public final class StructureTemplates {
 
 
-    private static final int STORM_PLATFORM_BLEND_RADIUS = 6;
-
     private static final Map<String, TemplateData> CACHE = new HashMap<String, TemplateData>();
     private static final Map<String, List<WeightedTemplate>> BOWELS_POOLS = createBowelsPools();
     private static final List<Block> FEATURE_CANNOT_REPLACE = Arrays.asList(
@@ -53,13 +45,6 @@ public final class StructureTemplates {
         @Override
         public Template.BlockInfo processBlock(World world, BlockPos worldPos, Template.BlockInfo blockInfo) {
             if (blockInfo.blockState.getBlock() == Blocks.AIR || cannotReplace(world, worldPos)) return null;
-            return blockInfo;
-        }
-    };
-    private static final ITemplateProcessor STORM_SPAWN_PLATFORM_PROCESSOR = new ITemplateProcessor() {
-        @Override
-        public Template.BlockInfo processBlock(World world, BlockPos worldPos, Template.BlockInfo blockInfo) {
-
             return blockInfo;
         }
     };
@@ -83,139 +68,6 @@ public final class StructureTemplates {
         return true;
     }
 
-
-    public static BlockPos placeStormSpawnPlatform(World world, String id, BlockPos origin, Rotation rotation) {
-        TemplateData data = getData(id);
-        if (data == null) return null;
-
-
-
-        BlockPos placementOrigin = getHorizontalCenteredOrigin(data.template, origin, rotation);
-        PlacementSettings settings = new PlacementSettings().setMirror(Mirror.NONE).setRotation(rotation)
-                .setIgnoreEntities(false).setIgnoreStructureBlock(true);
-        List<PlacedFragileBlock> fragileBlocks = new ArrayList<PlacedFragileBlock>();
-        ITemplateProcessor processor = new ITemplateProcessor() {
-            @Override
-            public Template.BlockInfo processBlock(World targetWorld, BlockPos worldPos,
-                                                    Template.BlockInfo blockInfo) {
-                if (isFragileStructureBlock(blockInfo.blockState)) {
-
-
-
-
-                    fragileBlocks.add(new PlacedFragileBlock(worldPos,
-                            blockInfo.blockState.withMirror(settings.getMirror())
-                                    .withRotation(settings.getRotation())));
-
-
-
-                    if (blockInfo.blockState.getBlock() instanceof BlockLadder) {
-                        return null;
-                    }
-                }
-                return blockInfo;
-            }
-        };
-        data.template.addBlocksToWorld(world, placementOrigin, processor, settings, 2);
-
-
-
-        for (PlacedFragileBlock fragile : fragileBlocks) {
-            if (fragile.state.getBlock() instanceof BlockLadder) continue;
-            if (world.isBlockLoaded(fragile.position)
-                    && world.getBlockState(fragile.position).getBlock() != fragile.state.getBlock()) {
-                world.setBlockState(fragile.position, fragile.state, 3);
-            }
-        }
-        blendStormPlatformTerrain(world, data.template, placementOrigin, rotation);
-        BlockPos spawnPosition = null;
-        for (DataMarker marker : data.dataMarkers) {
-            if ("spawn_position".equals(marker.metadata)) {
-                spawnPosition = Template.transformedBlockPos(settings, marker.pos).add(placementOrigin);
-
-                world.setBlockToAir(spawnPosition);
-                break;
-            }
-        }
-
-
-        for (PlacedFragileBlock fragile : fragileBlocks) {
-            if (!(fragile.state.getBlock() instanceof BlockLadder)
-                    || !world.isBlockLoaded(fragile.position)) continue;
-            world.setBlockState(fragile.position, fragile.state, 2);
-        }
-        if (spawnPosition != null) return spawnPosition;
-        if ("auto_spawn_platform".equals(id)) {
-            WitherStormMod.LOGGER.warn("Upstream automatic spawn platform has no spawn_position marker");
-        }
-
-
-        return origin;
-    }
-
-
-
-
-
-
-
-
-
-    private static void blendStormPlatformTerrain(World world, Template template, BlockPos placementOrigin,
-                                                   Rotation rotation) {
-        RelativeBounds bounds = getRelativeBounds(template, rotation);
-        int minX = placementOrigin.getX() + bounds.minX;
-        int maxX = placementOrigin.getX() + bounds.maxX;
-        int minZ = placementOrigin.getZ() + bounds.minZ;
-        int maxZ = placementOrigin.getZ() + bounds.maxZ;
-        int baseY = placementOrigin.getY();
-        int searchMinX = minX - STORM_PLATFORM_BLEND_RADIUS;
-        int searchMaxX = maxX + STORM_PLATFORM_BLEND_RADIUS;
-        int searchMinZ = minZ - STORM_PLATFORM_BLEND_RADIUS;
-        int searchMaxZ = maxZ + STORM_PLATFORM_BLEND_RADIUS;
-
-        for (int x = searchMinX; x <= searchMaxX; x++) {
-            for (int z = searchMinZ; z <= searchMaxZ; z++) {
-                if (x >= minX && x <= maxX && z >= minZ && z <= maxZ) continue;
-                int distance = Math.max(Math.max(minX - x, x - maxX), Math.max(minZ - z, z - maxZ));
-                if (distance <= 0 || distance > STORM_PLATFORM_BLEND_RADIUS) continue;
-                BlockPos column = new BlockPos(x, 0, z);
-                if (!world.isBlockLoaded(column)) continue;
-
-                double progress = distance / (double) (STORM_PLATFORM_BLEND_RADIUS + 1);
-                double smoothed = progress * progress * (3.0D - 2.0D * progress);
-                int targetTop = baseY - (int) Math.round(smoothed * STORM_PLATFORM_BLEND_RADIUS);
-                if (targetTop < 0) continue;
-
-                int currentTop = world.getHeight(column).getY() - 1;
-                if (currentTop == targetTop) continue;
-                IBlockState surface = world.getBlockState(new BlockPos(x, currentTop, z));
-                if (surface.getBlock() == Blocks.AIR || surface.getMaterial().isLiquid()) continue;
-
-                if (currentTop < targetTop) {
-
-                    for (int y = currentTop + 1; y < targetTop; y++) {
-                        world.setBlockState(new BlockPos(x, y, z), Blocks.DIRT.getDefaultState(), 2);
-                    }
-                    world.setBlockState(new BlockPos(x, targetTop, z), surface, 2);
-                } else {
-
-                    boolean blocked = false;
-                    for (int y = targetTop + 1; y <= currentTop; y++) {
-                        if (cannotReplace(world, new BlockPos(x, y, z))) {
-                            blocked = true;
-                            break;
-                        }
-                    }
-                    if (blocked) continue;
-                    for (int y = currentTop; y > targetTop; y--) {
-                        world.setBlockToAir(new BlockPos(x, y, z));
-                    }
-                    world.setBlockState(new BlockPos(x, targetTop, z), surface, 2);
-                }
-            }
-        }
-    }
 
     public static boolean remove(World world, String id, BlockPos origin, Rotation rotation) {
         Template template = get(id);
@@ -244,11 +96,6 @@ public final class StructureTemplates {
         return anchor.add(-bounds.centerX(), -bounds.centerY(), -bounds.centerZ());
     }
 
-    private static BlockPos getHorizontalCenteredOrigin(Template template, BlockPos anchor, Rotation rotation) {
-        RelativeBounds bounds = getRelativeBounds(template, rotation);
-        return anchor.add(-bounds.centerX(), 0, -bounds.centerZ());
-    }
-
 
     public static BlockPos getTopAnchoredFeatureOrigin(Template template, BlockPos anchor, Rotation rotation) {
         RelativeBounds bounds = getRelativeBounds(template, rotation);
@@ -268,17 +115,6 @@ public final class StructureTemplates {
 
     private static boolean cannotReplace(World world, BlockPos pos) {
         return FEATURE_CANNOT_REPLACE.contains(world.getBlockState(pos).getBlock());
-    }
-
-    private static boolean isFragileStructureBlock(IBlockState state) {
-        Block block = state.getBlock();
-        return block instanceof BlockButton
-                || block instanceof BlockLadder
-                || block instanceof BlockTorch
-                || block instanceof BlockTrapDoor
-                || block instanceof BlockPressurePlate
-                || block instanceof BlockRailBase
-                || block instanceof BlockSign;
     }
 
     private static RelativeBounds getRelativeBounds(Template template, Rotation rotation) {
@@ -362,7 +198,6 @@ public final class StructureTemplates {
         try (InputStream stream = UpstreamResourceArchive.open(path)) {
             NBTTagCompound root = CompressedStreamTools.readCompressed(stream);
             List<Connector> connectors = readConnectors(root);
-            List<DataMarker> dataMarkers = readDataMarkers(root);
             NBTTagList palette = root.getTagList("palette", 10);
             NBTTagList blocks = root.getTagList("blocks", 10);
             convertSkullBlockEntities(palette, blocks);
@@ -371,7 +206,7 @@ public final class StructureTemplates {
             root.setInteger("DataVersion", 1343);
             Template template = new Template();
             template.read(root);
-            return new TemplateData(template, connectors, dataMarkers);
+            return new TemplateData(template, connectors);
         } catch (IOException | RuntimeException exception) {
             WitherStormMod.LOGGER.error("Unable to convert upstream structure {}", id, exception);
             return null;
@@ -676,27 +511,6 @@ public final class StructureTemplates {
         return result;
     }
 
-    private static List<DataMarker> readDataMarkers(NBTTagCompound root) {
-        List<DataMarker> result = new ArrayList<DataMarker>();
-        NBTTagList palette = root.getTagList("palette", 10);
-        NBTTagList blocks = root.getTagList("blocks", 10);
-        for (int index = 0; index < blocks.tagCount(); index++) {
-            NBTTagCompound block = blocks.getCompoundTagAt(index);
-            int stateIndex = block.getInteger("state");
-            if (stateIndex < 0 || stateIndex >= palette.tagCount()
-                    || !"minecraft:structure_block".equals(palette.getCompoundTagAt(stateIndex).getString("Name"))) {
-                continue;
-            }
-            NBTTagCompound data = block.getCompoundTag("nbt");
-            String metadata = data.getString("metadata");
-            if (metadata.isEmpty()) continue;
-            NBTTagList position = block.getTagList("pos", 3);
-            result.add(new DataMarker(new BlockPos(position.getIntAt(0), position.getIntAt(1),
-                    position.getIntAt(2)), metadata));
-        }
-        return result;
-    }
-
     private static void enqueue(List<PendingConnector> queue, TemplateData data, BlockPos origin, Rotation rotation, int depth) {
         PlacementSettings settings = new PlacementSettings().setRotation(rotation);
         for (Connector connector : data.connectors) {
@@ -786,32 +600,10 @@ public final class StructureTemplates {
     private static final class TemplateData {
         private final Template template;
         private final List<Connector> connectors;
-        private final List<DataMarker> dataMarkers;
 
-        private TemplateData(Template template, List<Connector> connectors, List<DataMarker> dataMarkers) {
+        private TemplateData(Template template, List<Connector> connectors) {
             this.template = template;
             this.connectors = connectors;
-            this.dataMarkers = dataMarkers;
-        }
-    }
-
-    private static final class PlacedFragileBlock {
-        private final BlockPos position;
-        private final IBlockState state;
-
-        private PlacedFragileBlock(BlockPos position, IBlockState state) {
-            this.position = position;
-            this.state = state;
-        }
-    }
-
-    private static final class DataMarker {
-        private final BlockPos pos;
-        private final String metadata;
-
-        private DataMarker(BlockPos pos, String metadata) {
-            this.pos = pos;
-            this.metadata = metadata;
         }
     }
 

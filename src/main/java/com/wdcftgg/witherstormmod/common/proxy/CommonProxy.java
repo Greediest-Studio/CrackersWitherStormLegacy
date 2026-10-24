@@ -2,19 +2,14 @@ package com.wdcftgg.witherstormmod.common.proxy;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import com.wdcftgg.witherstormmod.common.tile.WitheredPhlegmTileEntity;
-import com.wdcftgg.witherstormmod.common.tile.AbstractSuperBeaconTileEntity;
 import com.wdcftgg.witherstormmod.common.network.ModNetwork;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-
-import java.util.Set;
-import net.minecraft.potion.Potion;
 
 public class CommonProxy {
 
@@ -43,11 +38,6 @@ public class CommonProxy {
     public void handleStopSound(ResourceLocation sound, SoundCategory category) {
     }
 
-    public void handlePhasometerObservation(EnumHand hand, int dimension,
-                                            int remainingUseTicks,
-                                            NBTTagCompound observation) {
-    }
-
     public void handleFormidibombExplosion(int sourceEntityId, double x, double y, double z,
                                            int radius, int squish) {
     }
@@ -60,16 +50,6 @@ public class CommonProxy {
                                     double motionX, double motionY, double motionZ) {
     }
 
-    public void spawnSuperBeaconResummonParticle(World world, BlockPos pos,
-                                                  java.util.Random random) {
-    }
-
-    public void handleSuperBeaconParticles(BlockPos pos, int type) {
-    }
-
-    public void handleSuperBeaconValidEffects(Set<Potion> effects) {
-    }
-
     public void handleCommandBlockParticles(ModNetwork.CommandBlockParticlesMessage message) {
     }
 
@@ -78,13 +58,6 @@ public class CommonProxy {
 
     public Object createWitheredPhlegmGui(EntityPlayer player, WitheredPhlegmTileEntity tile) {
         return null;
-    }
-
-    public Object createSuperBeaconGui(EntityPlayer player, AbstractSuperBeaconTileEntity tile) {
-        return null;
-    }
-
-    public void handleDistantSuperBeacon(ModNetwork.DistantSuperBeaconMessage message) {
     }
 
     public void handleBossThemeAccess(int entityId, boolean allowed) {

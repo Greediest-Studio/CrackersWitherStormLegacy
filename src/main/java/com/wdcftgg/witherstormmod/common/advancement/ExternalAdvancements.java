@@ -1,13 +1,14 @@
 package com.wdcftgg.witherstormmod.common.advancement;
 
-import com.wdcftgg.witherstormmod.Tags;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.wdcftgg.witherstormmod.Tags;
 import com.wdcftgg.witherstormmod.WitherStormMod;
 import com.wdcftgg.witherstormmod.common.resource.AdvancementResourceConverter;
 import com.wdcftgg.witherstormmod.common.resource.UpstreamResourceArchive;
 import net.minecraft.server.MinecraftServer;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,11 +18,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 public final class ExternalAdvancements {
 
-    private static final int EXPECTED_ADVANCEMENT_COUNT = 66;
+    private static final int MIN_EXPECTED_MAIN_ADVANCEMENTS = 10;
 
     private ExternalAdvancements() {
     }
@@ -33,17 +36,47 @@ public final class ExternalAdvancements {
     }
 
     public static int install(File advancementDirectory) throws IOException {
-        Map<File, GeneratedAdvancement> generated = new LinkedHashMap<File, GeneratedAdvancement>();
-        for (String relativeName : AdvancementResourceConverter.MAIN_CHAIN) {
+        File modAdvancementDir = new File(advancementDirectory, Tags.MOD_ID);
+        Map<String, String> originalParents = new LinkedHashMap<String, String>();
+        Map<String, JsonObject> convertedMain = new LinkedHashMap<String, JsonObject>();
+        Set<String> keptMainIds = new LinkedHashSet<String>();
+
+        for (String relativeName : AdvancementResourceConverter.ALL_MAIN_ADVANCEMENTS) {
             String entryName = AdvancementResourceConverter.sourceEntry(relativeName);
-            JsonObject converted;
+            byte[] rawBytes;
             try (InputStream source = UpstreamResourceArchive.open(entryName)) {
-                converted = AdvancementResourceConverter.convert(entryName, source);
+                rawBytes = source.readAllBytes();
             }
-            File target = new File(new File(advancementDirectory, Tags.MOD_ID), relativeName);
+            String id = AdvancementResourceConverter.advancementId(relativeName);
+            String parent = AdvancementResourceConverter.readParent(
+                    entryName, new ByteArrayInputStream(rawBytes));
+            if (parent != null) {
+                originalParents.put(id, parent);
+            }
+            JsonObject converted = AdvancementResourceConverter.convert(
+                    entryName, new ByteArrayInputStream(rawBytes));
+            if (converted != null) {
+                keptMainIds.add(id);
+                convertedMain.put(relativeName, converted);
+            }
+        }
+
+        if (convertedMain.size() < MIN_EXPECTED_MAIN_ADVANCEMENTS) {
+            throw new IOException("Expected at least " + MIN_EXPECTED_MAIN_ADVANCEMENTS
+                    + " main advancements but prepared " + convertedMain.size());
+        }
+
+        Map<File, GeneratedAdvancement> generated = new LinkedHashMap<File, GeneratedAdvancement>();
+        for (Map.Entry<String, JsonObject> entry : convertedMain.entrySet()) {
+            String relativeName = entry.getKey();
+            JsonObject converted = entry.getValue();
+            AdvancementResourceConverter.rewriteParent(converted, keptMainIds, originalParents);
+            String entryName = AdvancementResourceConverter.sourceEntry(relativeName);
+            File target = new File(modAdvancementDir, relativeName);
             generated.put(target, new GeneratedAdvancement(entryName,
                     AdvancementResourceConverter.serialize(converted)));
         }
+
         for (String entryName : UpstreamResourceArchive.listEntries(
                 AdvancementResourceConverter.ADVANCEMENT_PREFIX, ".json")) {
             String relativeName = entryName.substring(
@@ -54,24 +87,47 @@ public final class ExternalAdvancements {
                 converted = AdvancementResourceConverter.convertRecipeAdvancement(entryName, source);
             }
             if (converted == null) continue;
-            File target = new File(new File(advancementDirectory, Tags.MOD_ID), relativeName);
+            File target = new File(modAdvancementDir, relativeName);
             generated.put(target, new GeneratedAdvancement(entryName,
                     AdvancementResourceConverter.serialize(converted)));
-        }
-        if (generated.size() != EXPECTED_ADVANCEMENT_COUNT) {
-            throw new IOException("Expected " + EXPECTED_ADVANCEMENT_COUNT
-                    + " external advancements but prepared " + generated.size());
         }
 
         for (Map.Entry<File, GeneratedAdvancement> entry : generated.entrySet()) {
             verifyWritable(entry.getKey(), entry.getValue().sourceEntry);
         }
+        removeStaleGeneratedFiles(modAdvancementDir, generated.keySet());
         for (Map.Entry<File, GeneratedAdvancement> entry : generated.entrySet()) {
             writeAtomically(entry.getKey(), entry.getValue().json);
         }
         WitherStormMod.LOGGER.info("Prepared {} advancements from the external Wither Storm archive",
                 generated.size());
         return generated.size();
+    }
+
+    private static void removeStaleGeneratedFiles(File directory, Set<File> activeTargets)
+            throws IOException {
+        if (!directory.isDirectory()) return;
+        File[] children = directory.listFiles();
+        if (children == null) return;
+        for (File child : children) {
+            if (child.isDirectory()) {
+                removeStaleGeneratedFiles(child, activeTargets);
+                File[] remaining = child.listFiles();
+                if (remaining != null && remaining.length == 0) {
+                    child.delete();
+                }
+            } else if (child.isFile() && child.getName().endsWith(".json")
+                    && !activeTargets.contains(child)) {
+                try {
+                    String json = Files.readString(child.toPath(), StandardCharsets.UTF_8);
+                    JsonObject existing = JsonParser.parseString(json).getAsJsonObject();
+                    if (AdvancementResourceConverter.isAnyGeneratedFile(existing)) {
+                        Files.deleteIfExists(child.toPath());
+                    }
+                } catch (RuntimeException ignored) {
+                }
+            }
+        }
     }
 
     private static void verifyWritable(File target, String sourceEntry) throws IOException {

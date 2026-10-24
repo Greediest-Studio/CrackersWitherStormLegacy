@@ -914,13 +914,6 @@ public final class WitherStormAdminCommand extends CommandBase {
             storm.debugDropDeathClusters();
             return;
         }
-        if ("beacon".equals(args[1])) {
-            if (args.length != 4) throw new WrongUsageException(USAGE);
-            if (!"reset".equals(args[2])) throw new WrongUsageException(USAGE);
-            EntityPlayerMP player = getPlayer(server, sender, args[3]);
-            player.getEntityData().setBoolean("WitherStormActivatedSuperBeacon", false);
-            return;
-        }
         if ("evolutionProfiler".equals(args[1])) {
             requireArgs(args, 3);
             if ("begin".equals(args[2])) {
@@ -1271,7 +1264,7 @@ public final class WitherStormAdminCommand extends CommandBase {
                 values.add("logging");
                 if (debugCommandsAvailable()) {
                     Collections.addAll(values, "podium", "debris", "deathClusters",
-                            "beacon", "evolutionProfiler", "splitCluster", "symbiont",
+                            "evolutionProfiler", "splitCluster", "symbiont",
                             "potionTest", "caveRumble");
                 }
                 return getListOfStringsMatchingLastWord(args, values);
@@ -1334,9 +1327,6 @@ public final class WitherStormAdminCommand extends CommandBase {
             if ("deathClusters".equals(args[1])) {
                 return getListOfStringsMatchingLastWord(args, "drop");
             }
-            if ("beacon".equals(args[1])) {
-                return getListOfStringsMatchingLastWord(args, "reset");
-            }
             if ("symbiont".equals(args[1])) {
                 return getListOfStringsMatchingLastWord(args, "doSpell");
             }
@@ -1386,9 +1376,6 @@ public final class WitherStormAdminCommand extends CommandBase {
                     || ("deathClusters".equals(args[1]) && "drop".equals(args[2]))
                     || ("evolutionProfiler".equals(args[1]) && "query".equals(args[2]))) {
                 return entityTargets(server, args);
-            }
-            if ("beacon".equals(args[1]) && "reset".equals(args[2])) {
-                return playerTargets(server, args);
             }
             if ("symbiont".equals(args[1]) && "doSpell".equals(args[2])) {
                 return entityTargets(server, args);

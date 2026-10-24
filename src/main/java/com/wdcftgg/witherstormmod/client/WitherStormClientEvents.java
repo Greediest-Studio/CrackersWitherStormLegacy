@@ -11,17 +11,14 @@ import com.wdcftgg.witherstormmod.client.sound.WitherStormTrembleSound;
 import com.wdcftgg.witherstormmod.client.sound.BowelsLoopSound;
 import com.wdcftgg.witherstormmod.client.sound.BossThemeManager;
 import com.wdcftgg.witherstormmod.client.sound.CommandBlockLoopSound;
-import com.wdcftgg.witherstormmod.client.sound.FormidiBladeChargeSound;
 import com.wdcftgg.witherstormmod.client.sound.FormidibombFuseSound;
 import com.wdcftgg.witherstormmod.client.sound.TractorBeamLoopSound;
 import com.wdcftgg.witherstormmod.client.sound.WitheredSymbiontSpellLoopSound;
 import com.wdcftgg.witherstormmod.client.sound.WitheredSymbiontHeartbeatSound;
-import com.wdcftgg.witherstormmod.client.util.FormidiBladeAnimationHelper;
 import com.wdcftgg.witherstormmod.client.shader.PostProcessingShaders;
 import com.wdcftgg.witherstormmod.client.particle.CommandBlockParticle;
 import com.wdcftgg.witherstormmod.client.particle.PhlegmBlockParticle;
 import com.wdcftgg.witherstormmod.client.particle.TractorBeamParticle;
-import com.wdcftgg.witherstormmod.client.render.SuperBeaconRenderer;
 import com.wdcftgg.witherstormmod.client.render.TractorBeamRenderer;
 import com.wdcftgg.witherstormmod.client.render.WitherStormRenderer;
 import com.wdcftgg.witherstormmod.client.render.DistantProjection;
@@ -36,11 +33,9 @@ import com.wdcftgg.witherstormmod.common.entity.FormidibombSource;
 import com.wdcftgg.witherstormmod.common.entity.SickenedEntities;
 import com.wdcftgg.witherstormmod.common.entity.BossThemeProvider;
 import com.wdcftgg.witherstormmod.common.entity.TractorBeamProvider;
-import com.wdcftgg.witherstormmod.common.item.FormidiBladeItem;
 import com.wdcftgg.witherstormmod.common.config.WitherStormConfig;
 import com.wdcftgg.witherstormmod.common.capability.WitherSicknessCapability;
 import com.wdcftgg.witherstormmod.common.capability.WitherSicknessTracker;
-import com.wdcftgg.witherstormmod.common.resource.UpstreamItemTags;
 import com.wdcftgg.witherstormmod.common.init.ModSounds;
 import com.wdcftgg.witherstormmod.common.network.ModNetwork;
 import com.wdcftgg.witherstormmod.common.tile.FormidibombTileEntity;
@@ -84,7 +79,6 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderSpecificHandEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -127,8 +121,6 @@ public final class WitherStormClientEvents {
             new IdentityHashMap<SupplementalEntities.CommandBlockEntity, CommandBlockLoopSound>();
     private static final Map<Entity, TractorBeamLoopSound[]> TRACTOR_BEAM_LOOPS =
             new IdentityHashMap<Entity, TractorBeamLoopSound[]>();
-    private static final Map<EntityPlayer, FormidiBladeChargeSound> FORMIDI_BLADE_LOOPS =
-            new IdentityHashMap<EntityPlayer, FormidiBladeChargeSound>();
     private static final Map<SickenedEntities.WitheredSymbiontEntity, WitheredSymbiontSpellLoopSound>
             SYMBIONT_SPELL_LOOPS =
             new IdentityHashMap<SickenedEntities.WitheredSymbiontEntity, WitheredSymbiontSpellLoopSound>();
@@ -161,7 +153,6 @@ public final class WitherStormClientEvents {
     public static void registerModels(ModelRegistryEvent event) {
         ModBlocks.registerModels();
         ModItems.registerModels();
-        PhasometerModelCompatibility.registerModels();
         WitherStormMod.proxy.registerCrossbowModModels();
         WitherStormMod.LOGGER.info("Registered all legacy block and item models during ModelRegistryEvent");
     }
@@ -171,12 +162,10 @@ public final class WitherStormClientEvents {
         CommandBlockParticle.registerSprites(event.getMap());
         PhlegmBlockParticle.registerSprite(event.getMap());
         TractorBeamParticle.registerSprite(event.getMap());
-        SuperBeaconRenderer.registerSprites(event.getMap());
     }
 
     @SubscribeEvent
     public static void auditBakedModels(ModelBakeEvent event) {
-        PhasometerModelCompatibility.bakeModels(event);
         IBakedModel missing = event.getModelManager().getMissingModel();
         int checked = 0;
         int failed = 0;
@@ -231,9 +220,7 @@ public final class WitherStormClientEvents {
         }
         if (event.phase != TickEvent.Phase.END) return;
         BossThemeManager.INSTANCE.tick(minecraft);
-        AmuletAnimationHelper.tick(minecraft);
         TractorBeamOverlay.tick(minecraft);
-        PhasometerOverlay.tick(minecraft);
         if (!creativeStackModelsAudited) {
             auditCreativeStackModels(minecraft);
             creativeStackModelsAudited = true;
@@ -265,8 +252,6 @@ public final class WitherStormClientEvents {
                 stopTractorBeamLoops(beamLoops);
             }
             TRACTOR_BEAM_LOOPS.clear();
-            for (FormidiBladeChargeSound loop : FORMIDI_BLADE_LOOPS.values()) loop.stopImmediately();
-            FORMIDI_BLADE_LOOPS.clear();
             for (WitheredSymbiontSpellLoopSound loop : SYMBIONT_SPELL_LOOPS.values()) {
                 loop.stopImmediately();
             }
@@ -305,7 +290,6 @@ public final class WitherStormClientEvents {
             spawnTractorBeamParticles(minecraft);
             spawnCommandBlockItemParticles(minecraft);
         }
-        updateFormidiBladeChargeSound(minecraft);
         updateSymbiontSpellLoops(minecraft);
         updateSymbiontHeartbeatLoops(minecraft);
         tickWitherSicknessTrackers(minecraft);
@@ -338,8 +322,6 @@ public final class WitherStormClientEvents {
             stopTractorBeamLoops(loops);
         }
         TRACTOR_BEAM_LOOPS.clear();
-        for (FormidiBladeChargeSound loop : FORMIDI_BLADE_LOOPS.values()) loop.stopImmediately();
-        FORMIDI_BLADE_LOOPS.clear();
         for (WitheredSymbiontSpellLoopSound loop : SYMBIONT_SPELL_LOOPS.values()) {
             loop.stopImmediately();
         }
@@ -350,33 +332,6 @@ public final class WitherStormClientEvents {
         SYMBIONT_HEARTBEAT_LOOPS.clear();
         if (bowelsLoop != null) bowelsLoop.stop();
         bowelsLoop = null;
-    }
-
-    private static void updateFormidiBladeChargeSound(Minecraft minecraft) {
-        SoundEvent sound = ModSounds.get("formidibomb_pulse_loop");
-        for (EntityPlayer player : minecraft.world.playerEntities) {
-            FormidiBladeChargeSound loop = FORMIDI_BLADE_LOOPS.get(player);
-            if (FormidiBladeChargeSound.getPower(player) > 0.05F && sound != null
-                    && (loop == null || loop.isDonePlaying())) {
-                loop = new FormidiBladeChargeSound(player, sound);
-                FORMIDI_BLADE_LOOPS.put(player, loop);
-                playLoopSound(minecraft, loop);
-            }
-        }
-        Iterator<Map.Entry<EntityPlayer, FormidiBladeChargeSound>> iterator =
-                FORMIDI_BLADE_LOOPS.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<EntityPlayer, FormidiBladeChargeSound> entry = iterator.next();
-            if (entry.getKey().isDead || entry.getKey().world != minecraft.world) {
-                entry.getValue().stopImmediately();
-                iterator.remove();
-            } else if (FormidiBladeChargeSound.getPower(entry.getKey()) <= 0.05F) {
-                entry.getValue().stop();
-                iterator.remove();
-            } else if (entry.getValue().isDonePlaying()) {
-                iterator.remove();
-            }
-        }
     }
 
     private static void updateSymbiontSpellLoops(Minecraft minecraft) {
@@ -658,17 +613,6 @@ public final class WitherStormClientEvents {
                 return;
             }
         }
-    }
-
-    @SubscribeEvent
-    public static void renderAmuletInHand(RenderSpecificHandEvent event) {
-
-        if (PhasometerOverlay.isFirstPersonScoping(Minecraft.getMinecraft())) {
-            event.setCanceled(true);
-            return;
-        }
-        AmuletAnimationHelper.render(event);
-        FormidiBladeAnimationHelper.onRenderItemInHand(event);
     }
 
     @SubscribeEvent
@@ -1279,14 +1223,6 @@ public final class WitherStormClientEvents {
                 "chat.witherstormmod.optifine.notice"));
     }
 
-    @SubscribeEvent
-    public static void renderPhasometerOverlay(RenderGameOverlayEvent.Pre event) {
-        if (event.getType() == RenderGameOverlayEvent.ElementType.HELMET) {
-            PhasometerOverlay.render(Minecraft.getMinecraft(), event.getResolution(),
-                    event.getPartialTicks());
-        }
-    }
-
     private static void updateBowelsAmbience(Minecraft minecraft) {
         if (minecraft.player.dimension != BowelsDimensions.DIMENSION_ID) {
             if (bowelsLoop != null) bowelsLoop.stop();
@@ -1363,8 +1299,8 @@ public final class WitherStormClientEvents {
             EntityItem item = (EntityItem) entity;
             if (item.getItem().isEmpty()) continue;
             if (item.getItem().getItem() != ModItems.get("command_block_book")
-                    && !UpstreamItemTags.contains(
-                    UpstreamItemTags.COMMAND_BLOCK_TOOLS, item.getItem())) continue;
+                    && !com.wdcftgg.witherstormmod.api.common.registry.CommandBlockTools.contains(
+                    item.getItem())) continue;
             CommandBlockParticle.spawnForItemEntity(item);
         }
     }

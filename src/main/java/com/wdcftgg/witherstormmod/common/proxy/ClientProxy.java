@@ -2,7 +2,6 @@ package com.wdcftgg.witherstormmod.common.proxy;
 
 import com.wdcftgg.witherstormmod.WitherStormMod;
 import com.wdcftgg.witherstormmod.client.ClientEffects;
-import com.wdcftgg.witherstormmod.client.PhasometerOverlay;
 import com.wdcftgg.witherstormmod.client.WitherStormClientConfig;
 import com.wdcftgg.witherstormmod.client.WitherStormClientEvents;
 import com.wdcftgg.witherstormmod.client.render.CommandBlockRenderer;
@@ -18,9 +17,7 @@ import com.wdcftgg.witherstormmod.client.particle.PhlegmBlockParticle;
 import com.wdcftgg.witherstormmod.client.particle.CommandBlockParticle;
 import com.wdcftgg.witherstormmod.client.sound.BossThemeManager;
 import com.wdcftgg.witherstormmod.client.gui.WitheredPhlegmScreen;
-import com.wdcftgg.witherstormmod.client.gui.SuperBeaconScreen;
 import com.wdcftgg.witherstormmod.common.inventory.WitheredPhlegmContainer;
-import com.wdcftgg.witherstormmod.common.inventory.SuperBeaconContainer;
 import com.wdcftgg.witherstormmod.client.render.SickenedRendererRegistry;
 import com.wdcftgg.witherstormmod.common.entity.WitherStormEntity;
 import com.wdcftgg.witherstormmod.common.entity.PowerfulExplosiveEntity;
@@ -35,11 +32,6 @@ import com.wdcftgg.witherstormmod.client.resources.WitherStormResourceConfigMana
 import com.wdcftgg.witherstormmod.client.shader.PostProcessingShaders;
 import com.wdcftgg.witherstormmod.common.tile.TaintedSignTileEntity;
 import com.wdcftgg.witherstormmod.common.tile.WitheredPhlegmTileEntity;
-import com.wdcftgg.witherstormmod.common.tile.AbstractSuperBeaconTileEntity;
-import com.wdcftgg.witherstormmod.common.tile.SuperBeaconTileEntity;
-import com.wdcftgg.witherstormmod.common.tile.SuperSupportBeaconTileEntity;
-import com.wdcftgg.witherstormmod.client.render.SuperBeaconRenderer;
-import com.wdcftgg.witherstormmod.client.DistantSuperBeaconRenderer;
 import com.wdcftgg.witherstormmod.common.network.ModNetwork;
 import com.wdcftgg.witherstormmod.common.block.WitheredPhlegmBlock;
 import com.wdcftgg.witherstormmod.common.block.TaintedDustBlock;
@@ -56,7 +48,6 @@ import net.minecraft.client.model.ModelWither;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -66,7 +57,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.Potion;
 import com.wdcftgg.witherstormmod.client.render.SickenedMobRenderer;
 import com.wdcftgg.witherstormmod.client.render.PowerfulExplosiveRenderer;
 import com.wdcftgg.witherstormmod.client.render.FlamingWitherSkullRenderer;
@@ -79,7 +69,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.Loader;
 
 import java.lang.reflect.Method;
-import java.util.Set;
 
 public class ClientProxy extends CommonProxy {
     private static final String CROSSBOW_CLIENT_COMPATIBILITY =
@@ -117,8 +106,6 @@ public class ClientProxy extends CommonProxy {
         SickenedRendererRegistry.register();
         ClientRegistry.bindTileEntitySpecialRenderer(TaintedSignTileEntity.class, new TaintedSignRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(WitheredPhlegmTileEntity.class, new WitheredPhlegmRenderer());
-        ClientRegistry.bindTileEntitySpecialRenderer(SuperBeaconTileEntity.class, new SuperBeaconRenderer());
-        ClientRegistry.bindTileEntitySpecialRenderer(SuperSupportBeaconTileEntity.class, new SuperBeaconRenderer());
         ModelLoader.setCustomStateMapper(ModBlocks.get("tainted_door"), new StateMap.Builder().ignore(BlockDoor.POWERED).build());
         ModelLoader.setCustomStateMapper(ModBlocks.get("tainted_fence_gate"), new StateMap.Builder().ignore(BlockFenceGate.POWERED).build());
         ModelLoader.setCustomStateMapper(ModBlocks.get("tainted_sign"),
@@ -195,17 +182,6 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public void handlePhasometerObservation(EnumHand hand, int dimension,
-                                            int remainingUseTicks,
-                                            NBTTagCompound observation) {
-        final NBTTagCompound snapshot = observation == null
-                ? new NBTTagCompound() : observation.copy();
-        Minecraft.getMinecraft().addScheduledTask(() ->
-                PhasometerOverlay.acceptObservation(hand, dimension,
-                        remainingUseTicks, snapshot));
-    }
-
-    @Override
     public void handleFormidibombExplosion(int sourceEntityId, double x, double y, double z,
                                            int radius, int squish) {
         Minecraft.getMinecraft().addScheduledTask(
@@ -236,29 +212,6 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public void spawnSuperBeaconResummonParticle(World world, BlockPos pos,
-                                                  java.util.Random random) {
-        CommandBlockParticle.spawnForSuperBeacon(world, pos, random);
-    }
-
-    @Override
-    public void handleSuperBeaconParticles(BlockPos pos, int type) {
-        Minecraft.getMinecraft().addScheduledTask(
-                () -> CommandBlockParticle.spawnSuperBeaconBurst(pos, type));
-    }
-
-    @Override
-    public void handleSuperBeaconValidEffects(Set<Potion> effects) {
-        final Set<Potion> snapshot = new java.util.HashSet<Potion>(effects);
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (Minecraft.getMinecraft().currentScreen instanceof SuperBeaconScreen) {
-                ((SuperBeaconScreen) Minecraft.getMinecraft().currentScreen)
-                        .setValidEffects(snapshot);
-            }
-        });
-    }
-
-    @Override
     public void handleCommandBlockParticles(ModNetwork.CommandBlockParticlesMessage message) {
         Minecraft.getMinecraft().addScheduledTask(() -> CommandBlockParticle.spawnBurst(
                 message.getPosition(), message.getCount(), message.getSpreadX(),
@@ -283,16 +236,6 @@ public class ClientProxy extends CommonProxy {
     @Override
     public Object createWitheredPhlegmGui(EntityPlayer player, WitheredPhlegmTileEntity tile) {
         return new WitheredPhlegmScreen(new WitheredPhlegmContainer(player.inventory, tile), tile);
-    }
-
-    @Override
-    public Object createSuperBeaconGui(EntityPlayer player, AbstractSuperBeaconTileEntity tile) {
-        return new SuperBeaconScreen(new SuperBeaconContainer(tile), tile);
-    }
-
-    @Override
-    public void handleDistantSuperBeacon(ModNetwork.DistantSuperBeaconMessage message) {
-        Minecraft.getMinecraft().addScheduledTask(() -> DistantSuperBeaconRenderer.update(message));
     }
 
     @Override

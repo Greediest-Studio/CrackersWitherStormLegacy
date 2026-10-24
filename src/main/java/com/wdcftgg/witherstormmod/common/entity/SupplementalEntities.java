@@ -1911,17 +1911,8 @@ public final class SupplementalEntities {
         }
 
         private static boolean isCommandBlockTool(ItemStack stack) {
-            return com.wdcftgg.witherstormmod.api.common.registry.CommandBlockTools.contains(stack)
-                    || isLegacyCommandBlockTool(stack);
-        }
-
-        private static boolean isLegacyCommandBlockTool(ItemStack stack) {
-            if (stack == null || stack.isEmpty() || stack.getItem().getRegistryName() == null) return false;
-            ResourceLocation id = stack.getItem().getRegistryName();
-            if (!Tags.MOD_ID.equals(id.getNamespace())) return false;
-            String path = id.getPath();
-            return path.equals("eye_of_the_storm") || path.equals("formidi_blade")
-                    || path.matches("(?:wooden_|stone_|iron_|gold_)?command_block_(?:sword|pickaxe|axe|shovel|hoe)");
+            return stack != null
+                    && com.wdcftgg.witherstormmod.api.common.registry.CommandBlockTools.contains(stack);
         }
 
         @Override

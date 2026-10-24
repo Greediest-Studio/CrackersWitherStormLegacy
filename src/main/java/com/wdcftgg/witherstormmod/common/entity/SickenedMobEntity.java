@@ -574,6 +574,6 @@ public abstract class SickenedMobEntity extends EntityMob {
     @Nullable
     @Override
     protected Item getDropItem() {
-        return rand.nextBoolean() ? ModItems.get("withered_flesh") : ModItems.get("withered_bone");
+        return rand.nextBoolean() ? null : ModItems.get("withered_bone");
     }
 }

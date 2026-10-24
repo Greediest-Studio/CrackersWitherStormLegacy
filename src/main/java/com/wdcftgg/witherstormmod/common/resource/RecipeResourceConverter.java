@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.wdcftgg.witherstormmod.common.init.ModRegistryNames;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +32,6 @@ public final class RecipeResourceConverter {
         mappings.put("minecraft:black_dye", item("minecraft:dye", 0));
         mappings.put("minecraft:lapis_lazuli", item("minecraft:dye", 4));
         mappings.put("minecraft:firework_rocket", item("minecraft:fireworks"));
-        mappings.put("minecraft:spyglass", item("minecraft:glass_bottle"));
         mappings.put("minecraft:barrel", item("futuremc:barrel"));
         mappings.put("minecraft:golden_apple", item("minecraft:golden_apple", 0));
         mappings.put("minecraft:crossbow", item("crossbow:crossbow"));
@@ -56,6 +56,11 @@ public final class RecipeResourceConverter {
                 return null;
             }
 
+            JsonObject result = convertResult(required(recipe, "result"));
+            if (!ModRegistryNames.isRegisteredItem(string(result, "item"))) {
+                return null;
+            }
+
             JsonObject converted = new JsonObject();
             converted.addProperty("type", type);
             if (recipe.has("group") && recipe.get("group").isJsonPrimitive()) {
@@ -66,17 +71,25 @@ public final class RecipeResourceConverter {
                 JsonObject sourceKey = required(recipe, "key").getAsJsonObject();
                 JsonObject key = new JsonObject();
                 for (Map.Entry<String, JsonElement> entry : sourceKey.entrySet()) {
-                    key.add(entry.getKey(), convertIngredient(entry.getValue()));
+                    JsonElement convertedEntry = convertIngredientOrNull(entry.getValue());
+                    if (convertedEntry == null) {
+                        return null;
+                    }
+                    key.add(entry.getKey(), convertedEntry);
                 }
                 converted.add("key", key);
             } else {
                 JsonArray ingredients = new JsonArray();
                 for (JsonElement ingredient : required(recipe, "ingredients").getAsJsonArray()) {
-                    ingredients.add(convertIngredient(ingredient));
+                    JsonElement convertedIngredient = convertIngredientOrNull(ingredient);
+                    if (convertedIngredient == null) {
+                        return null;
+                    }
+                    ingredients.add(convertedIngredient);
                 }
                 converted.add("ingredients", ingredients);
             }
-            converted.add("result", convertResult(required(recipe, "result")));
+            converted.add("result", result);
             return converted;
         } catch (RuntimeException exception) {
             throw new IOException("Unable to convert upstream recipe " + sourceName, exception);
@@ -91,52 +104,31 @@ public final class RecipeResourceConverter {
                 return null;
             }
 
-            JsonObject converted = new JsonObject();
-            converted.addProperty("type", "minecraft:stonecutting");
-            converted.add("ingredient", convertIngredient(required(recipe, "ingredient")));
+            JsonElement convertedIngredient = convertIngredientOrNull(required(recipe, "ingredient"));
+            if (convertedIngredient == null) {
+                return null;
+            }
 
             JsonElement sourceResult = required(recipe, "result");
             if (!sourceResult.isJsonPrimitive()) {
                 throw new IOException("Stonecutting result must be an item name");
             }
+            ItemMapping mappedResult = mappedItem(sourceResult.getAsString());
+            if (!ModRegistryNames.isRegisteredItem(mappedResult.name)) {
+                return null;
+            }
             int count = recipe.has("count") ? recipe.get("count").getAsInt() : 1;
             if (count < 1 || count > 64) {
                 throw new IOException("Stonecutting result count is outside the Minecraft stack range: " + count);
             }
-            converted.add("result", mappedItem(sourceResult.getAsString()).toJson(count));
+
+            JsonObject converted = new JsonObject();
+            converted.addProperty("type", "minecraft:stonecutting");
+            converted.add("ingredient", convertedIngredient);
+            converted.add("result", mappedResult.toJson(count));
             return converted;
         } catch (RuntimeException exception) {
             throw new IOException("Unable to convert upstream stonecutting recipe " + sourceName, exception);
-        }
-    }
-
-    public static JsonObject convertAnvil(String sourceName, InputStream source) throws IOException {
-        try {
-            JsonObject recipe = JsonParser.parseReader(
-                    new InputStreamReader(source, StandardCharsets.UTF_8)).getAsJsonObject();
-            if (!"witherstormmod:anvil".equals(string(recipe, "type"))) {
-                return null;
-            }
-
-            JsonObject converted = new JsonObject();
-            converted.addProperty("type", "witherstormmod:anvil");
-            converted.add("left", convertIngredient(required(recipe, "left")));
-            converted.add("right", convertIngredient(required(recipe, "right")));
-            converted.add("result", convertResult(required(recipe, "result")));
-            converted.addProperty("cost", required(recipe, "cost").getAsInt());
-            return converted;
-        } catch (RuntimeException exception) {
-            throw new IOException("Unable to convert upstream anvil recipe " + sourceName, exception);
-        }
-    }
-
-    public static boolean isLockAmulet(String sourceName, InputStream source) throws IOException {
-        try {
-            JsonObject recipe = JsonParser.parseReader(
-                    new InputStreamReader(source, StandardCharsets.UTF_8)).getAsJsonObject();
-            return "witherstormmod:lock_amulet".equals(string(recipe, "type"));
-        } catch (RuntimeException exception) {
-            throw new IOException("Unable to inspect upstream amulet lock recipe " + sourceName, exception);
         }
     }
 
@@ -145,6 +137,14 @@ public final class RecipeResourceConverter {
     }
 
     public static JsonElement convertIngredient(JsonElement source) throws IOException {
+        JsonElement converted = convertIngredientOrNull(source);
+        if (converted == null) {
+            throw new IOException("Ingredient has no registered Minecraft 1.12.2 choices");
+        }
+        return converted;
+    }
+
+    private static JsonElement convertIngredientOrNull(JsonElement source) throws IOException {
         if (source.isJsonArray()) {
             JsonArray choices = new JsonArray();
             for (JsonElement choice : source.getAsJsonArray()) {
@@ -152,15 +152,11 @@ public final class RecipeResourceConverter {
                 if (converted != null) choices.add(converted);
             }
             if (choices.size() == 0) {
-                throw new IOException("Ingredient has no Minecraft 1.12.2 choices");
+                return null;
             }
             return choices.size() == 1 ? choices.get(0) : choices;
         }
-        JsonElement converted = convertIngredientChoice(source);
-        if (converted == null) {
-            throw new IOException("Ingredient is unavailable in Minecraft 1.12.2");
-        }
-        return converted;
+        return convertIngredientChoice(source);
     }
 
     private static JsonElement convertIngredientChoice(JsonElement source) throws IOException {
@@ -178,7 +174,11 @@ public final class RecipeResourceConverter {
         if ("minecraft:torchflower_seeds".equals(sourceItem)) {
             return null;
         }
-        return mappedItem(sourceItem).toIngredientJson(
+        ItemMapping mapped = mappedItem(sourceItem);
+        if (!ModRegistryNames.isRegisteredItem(mapped.name)) {
+            return null;
+        }
+        return mapped.toIngredientJson(
                 ingredient.has("count") ? ingredient.get("count").getAsInt() : null);
     }
 
@@ -197,9 +197,7 @@ public final class RecipeResourceConverter {
             choices.add(item("minecraft:magma_cream").toIngredientJson(null));
         } else if ("witherstormmod:cure_ingredient".equals(tag)) {
             choices.add(item("futuremc:wither_rose").toIngredientJson(null));
-            choices.add(item("witherstormmod:withered_flesh").toIngredientJson(null));
             choices.add(item("witherstormmod:withered_bone").toIngredientJson(null));
-            choices.add(item("witherstormmod:withered_spider_eye").toIngredientJson(null));
         } else {
             throw new IOException("No Minecraft 1.12.2 mapping for ingredient tag " + tag);
         }

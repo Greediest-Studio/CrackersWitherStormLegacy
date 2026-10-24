@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.wdcftgg.witherstormmod.WitherStormMod;
+import com.wdcftgg.witherstormmod.common.init.ModRegistryNames;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockSapling;
@@ -61,7 +62,10 @@ public final class UpstreamItemTags {
                 }
                 List<String> values = new ArrayList<String>();
                 for (JsonElement element : sourceValues) {
-                    values.add(readTagValue(element, entryName));
+                    String value = readTagValue(element, entryName);
+                    if (value.startsWith("#") || ModRegistryNames.isRegisteredItem(value)) {
+                        values.add(value);
+                    }
                 }
                 loaded.put(tagName, new TagDefinition(
                         root.has("replace") && root.get("replace").getAsBoolean(), values));

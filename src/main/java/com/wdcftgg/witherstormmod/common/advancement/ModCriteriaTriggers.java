@@ -13,13 +13,6 @@ public final class ModCriteriaTriggers {
     public static final EntityTrigger NEARLY_KILL_WITHER_STORM = entityTrigger("nearly_kill_wither_storm", "entity");
     public static final CuredSickenedMobTrigger CURED_SICKENED_MOB =
             new CuredSickenedMobTrigger(id("cured_sickened_mob"));
-    public static final CountTrigger ACTIVATE_SUPER_BEACON =
-            new CountTrigger(id("activate_super_beacon"), "total_activated");
-    public static final EntityTrigger SUMMON_MOB_SUPER_BEACON =
-            entityTrigger("summon_mob_withered_beacon", "resummoned");
-    public static final LinkAmuletTrigger LINK_AMULET = new LinkAmuletTrigger();
-    public static final ObserveWitherStormTrigger OBSERVE_WITHER_STORM =
-            new ObserveWitherStormTrigger(id("observe_wither_storm"));
     private static boolean registered;
 
     private ModCriteriaTriggers() {
@@ -33,10 +26,6 @@ public final class ModCriteriaTriggers {
         CriteriaTriggers.register(RING_BELL_NEAR_STORM);
         CriteriaTriggers.register(NEARLY_KILL_WITHER_STORM);
         CriteriaTriggers.register(CURED_SICKENED_MOB);
-        CriteriaTriggers.register(ACTIVATE_SUPER_BEACON);
-        CriteriaTriggers.register(SUMMON_MOB_SUPER_BEACON);
-        CriteriaTriggers.register(LINK_AMULET);
-        CriteriaTriggers.register(OBSERVE_WITHER_STORM);
         registered = true;
     }
 

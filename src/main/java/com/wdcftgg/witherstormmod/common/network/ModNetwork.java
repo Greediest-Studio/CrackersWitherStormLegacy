@@ -10,18 +10,14 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketEntityVelocity;
-import net.minecraft.potion.Potion;
 import com.wdcftgg.witherstormmod.common.entity.WitherStormEntity;
 import com.wdcftgg.witherstormmod.common.entity.SupplementalEntities;
 import com.wdcftgg.witherstormmod.common.entity.DistantStormTrackingResync;
 import com.wdcftgg.witherstormmod.common.util.StormDiagnosticLogger;
-import com.wdcftgg.witherstormmod.common.inventory.SuperBeaconContainer;
-import com.wdcftgg.witherstormmod.common.tile.AbstractSuperBeaconTileEntity;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -35,13 +31,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
-import java.util.HashSet;
-import java.util.Set;
-
-
 public final class ModNetwork {
-    public static final int SUPER_BEACON_RESUMMON_BURST = 0;
-    public static final int SUPER_BEACON_ITEM_BURST = 1;
     public static final int COMMAND_BLOCK_PARTICLES_GAUSSIAN = 0;
     public static final int COMMAND_BLOCK_PARTICLES_UNIFORM_VELOCITY = 1;
     public static final int COMMAND_BLOCK_PARTICLES_EXACT_VELOCITY = 2;
@@ -62,14 +52,6 @@ public final class ModNetwork {
                 discriminator++, Side.CLIENT);
         CHANNEL.registerMessage(FormidibombExplosionMessage.Handler.class, FormidibombExplosionMessage.class,
                 discriminator++, Side.CLIENT);
-        CHANNEL.registerMessage(SuperBeaconSetEffectMessage.Handler.class, SuperBeaconSetEffectMessage.class,
-                discriminator++, Side.SERVER);
-        CHANNEL.registerMessage(SuperBeaconToggleAreaMessage.Handler.class, SuperBeaconToggleAreaMessage.class,
-                discriminator++, Side.SERVER);
-        CHANNEL.registerMessage(SuperBeaconParticlesMessage.Handler.class, SuperBeaconParticlesMessage.class,
-                discriminator++, Side.CLIENT);
-        CHANNEL.registerMessage(DistantSuperBeaconMessage.Handler.class, DistantSuperBeaconMessage.class,
-                discriminator++, Side.CLIENT);
         CHANNEL.registerMessage(InjureWitherStormHeadMessage.Handler.class, InjureWitherStormHeadMessage.class,
                 discriminator++, Side.SERVER);
         CHANNEL.registerMessage(BossThemeAccessMessage.Handler.class, BossThemeAccessMessage.class,
@@ -86,14 +68,10 @@ public final class ModNetwork {
                 UpdateDamagingProjectileMessage.class, discriminator++, Side.CLIENT);
         CHANNEL.registerMessage(HeadAttackedMessage.Handler.class, HeadAttackedMessage.class,
                 discriminator++, Side.CLIENT);
-        CHANNEL.registerMessage(SuperBeaconValidEffectsMessage.Handler.class,
-                SuperBeaconValidEffectsMessage.class, discriminator++, Side.CLIENT);
         CHANNEL.registerMessage(CreateDebrisMessage.Handler.class, CreateDebrisMessage.class,
                 discriminator++, Side.CLIENT);
         CHANNEL.registerMessage(StopSoundMessage.Handler.class, StopSoundMessage.class,
                 discriminator++, Side.CLIENT);
-        CHANNEL.registerMessage(PhasometerObservationMessage.Handler.class,
-                PhasometerObservationMessage.class, discriminator++, Side.CLIENT);
         CHANNEL.registerMessage(AttackPlayingDeadCoreMessage.Handler.class,
                 AttackPlayingDeadCoreMessage.class, discriminator++, Side.SERVER);
         CHANNEL.registerMessage(CommandBlockTickParticlesMessage.Handler.class,
@@ -144,11 +122,6 @@ public final class ModNetwork {
         CHANNEL.sendTo(new WitherSicknessMessage(entity.getEntityId(), data), player);
     }
 
-    public static void sendSuperBeaconValidEffects(EntityPlayerMP player, Set<Potion> effects) {
-        if (player == null || effects == null) return;
-        CHANNEL.sendTo(new SuperBeaconValidEffectsMessage(effects), player);
-    }
-
     public static void shakeNear(World world, double x, double y, double z, double radius,
                                  float duration, float power) {
         if (world == null || world.isRemote) return;
@@ -194,28 +167,12 @@ public final class ModNetwork {
         CHANNEL.sendTo(new StopSoundMessage(sound.getRegistryName(), category), player);
     }
 
-    public static void sendPhasometerObservation(EntityPlayerMP player, EnumHand hand,
-                                                  int remainingUseTicks,
-                                                  NBTTagCompound observation) {
-        if (player == null || hand == null || observation == null) return;
-        CHANNEL.sendTo(new PhasometerObservationMessage(hand,
-                player.dimension, remainingUseTicks, observation), player);
-    }
-
     public static void sendFormidibombExplosion(World world, Entity source, double x, double y, double z,
                                                 int radius, int squish) {
         if (world == null || world.isRemote) return;
         int sourceId = source == null ? 0 : source.getEntityId();
         CHANNEL.sendToDimension(new FormidibombExplosionMessage(sourceId, x, y, z, radius, squish),
                 world.provider.getDimension());
-    }
-
-    public static void setSuperBeaconEffect(int effectId) {
-        CHANNEL.sendToServer(new SuperBeaconSetEffectMessage(effectId));
-    }
-
-    public static void toggleSuperBeaconArea(boolean show) {
-        CHANNEL.sendToServer(new SuperBeaconToggleAreaMessage(show));
     }
 
     public static void notifyClientWorldReady(int dimension) {
@@ -234,14 +191,6 @@ public final class ModNetwork {
         CHANNEL.sendToAll(new DiagnosticLoggingMessage(StormDiagnosticLogger.isEnabled()));
     }
 
-    public static void sendSuperBeaconParticles(World world, BlockPos position,
-                                                int type) {
-        if (world == null || world.isRemote || position == null) return;
-        CHANNEL.sendToAllAround(new SuperBeaconParticlesMessage(position, type),
-                new NetworkRegistry.TargetPoint(world.provider.getDimension(),
-                        position.getX() + 0.5D, position.getY() + 1.5D, position.getZ() + 0.5D, 96.0D));
-    }
-
     public static void sendCommandBlockParticles(World world, Vec3d position, int count,
                                                  double spreadX, double spreadY, double spreadZ,
                                                  double speed, int distribution) {
@@ -258,22 +207,6 @@ public final class ModNetwork {
         if (entity == null || entity.world == null || entity.world.isRemote) return;
         CHANNEL.sendToAllTracking(new CommandBlockTickParticlesMessage(entity.getEntityId(),
                 particleSpeed, luringPlayerId), entity);
-    }
-
-    public static void updateDistantSuperBeacon(AbstractSuperBeaconTileEntity beacon) {
-        if (beacon == null || beacon.getWorld() == null || beacon.getWorld().isRemote) return;
-        int[] color = beacon.getBeamColor();
-        CHANNEL.sendToDimension(new DistantSuperBeaconMessage(beacon.getPos(), color,
-                        beacon.isActive(), beacon.getBeamHeight(), beacon.getBeamThickness(),
-                        beacon.getOuterBeamThickness(), false),
-                beacon.getWorld().provider.getDimension());
-    }
-
-    public static void removeDistantSuperBeacon(AbstractSuperBeaconTileEntity beacon) {
-        if (beacon == null || beacon.getWorld() == null || beacon.getWorld().isRemote) return;
-        CHANNEL.sendToDimension(new DistantSuperBeaconMessage(beacon.getPos(), new int[] {255, 255, 255},
-                        false, 0, 0.0F, 0.0F, true),
-                beacon.getWorld().provider.getDimension());
     }
 
     public static void injureWitherStormHead(WitherStormEntity storm, int head) {
@@ -497,53 +430,6 @@ public final class ModNetwork {
         }
     }
 
-    public static final class PhasometerObservationMessage implements IMessage {
-        private EnumHand hand = EnumHand.MAIN_HAND;
-        private int dimension;
-        private int remainingUseTicks;
-        private NBTTagCompound observation = new NBTTagCompound();
-
-        public PhasometerObservationMessage() {
-        }
-
-        public PhasometerObservationMessage(EnumHand hand, int dimension,
-                                            int remainingUseTicks,
-                                            NBTTagCompound observation) {
-            this.hand = hand;
-            this.dimension = dimension;
-            this.remainingUseTicks = remainingUseTicks;
-            this.observation = observation.copy();
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buffer) {
-            hand = buffer.readBoolean() ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND;
-            dimension = buffer.readInt();
-            remainingUseTicks = buffer.readUnsignedShort();
-            NBTTagCompound decoded = ByteBufUtils.readTag(buffer);
-            observation = decoded == null ? new NBTTagCompound() : decoded;
-        }
-
-        @Override
-        public void toBytes(ByteBuf buffer) {
-            buffer.writeBoolean(hand == EnumHand.OFF_HAND);
-            buffer.writeInt(dimension);
-            buffer.writeShort(Math.max(0, Math.min(65535, remainingUseTicks)));
-            ByteBufUtils.writeTag(buffer, observation);
-        }
-
-        public static final class Handler
-                implements IMessageHandler<PhasometerObservationMessage, IMessage> {
-            @Override
-            public IMessage onMessage(PhasometerObservationMessage message,
-                                      MessageContext context) {
-                WitherStormMod.proxy.handlePhasometerObservation(message.hand,
-                        message.dimension, message.remainingUseTicks, message.observation);
-                return null;
-            }
-        }
-    }
-
     public static final class FormidibombExplosionMessage implements IMessage {
         private int sourceEntityId;
         private double x;
@@ -614,85 +500,6 @@ public final class ModNetwork {
             public IMessage onMessage(FormidibombExplosionMessage message, MessageContext context) {
                 WitherStormMod.proxy.handleFormidibombExplosion(message.sourceEntityId,
                         message.x, message.y, message.z, message.radius, message.squish);
-                return null;
-            }
-        }
-    }
-
-    public static final class SuperBeaconSetEffectMessage implements IMessage {
-        private int effectId;
-
-        public SuperBeaconSetEffectMessage() {
-        }
-
-        public SuperBeaconSetEffectMessage(int effectId) {
-            this.effectId = effectId;
-        }
-
-        public int getEffectId() {
-            return effectId;
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buffer) {
-            effectId = buffer.readInt();
-        }
-
-        @Override
-        public void toBytes(ByteBuf buffer) {
-            buffer.writeInt(effectId);
-        }
-
-        public static final class Handler implements IMessageHandler<SuperBeaconSetEffectMessage, IMessage> {
-            @Override
-            public IMessage onMessage(final SuperBeaconSetEffectMessage message, final MessageContext context) {
-                final EntityPlayerMP player = context.getServerHandler().player;
-                player.getServerWorld().addScheduledTask(() -> {
-                    if (player.openContainer instanceof SuperBeaconContainer
-                            && player.openContainer.canInteractWith(player)) {
-                        ((SuperBeaconContainer) player.openContainer).requestEffect(player, message.effectId);
-                    }
-                });
-                return null;
-            }
-        }
-    }
-
-    public static final class SuperBeaconToggleAreaMessage implements IMessage {
-        private boolean show;
-
-        public SuperBeaconToggleAreaMessage() {
-        }
-
-        public SuperBeaconToggleAreaMessage(boolean show) {
-            this.show = show;
-        }
-
-        public boolean shouldShowArea() {
-            return show;
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buffer) {
-            show = buffer.readBoolean();
-        }
-
-        @Override
-        public void toBytes(ByteBuf buffer) {
-            buffer.writeBoolean(show);
-        }
-
-        public static final class Handler implements IMessageHandler<SuperBeaconToggleAreaMessage, IMessage> {
-            @Override
-            public IMessage onMessage(final SuperBeaconToggleAreaMessage message,
-                                      final MessageContext context) {
-                final EntityPlayerMP player = context.getServerHandler().player;
-                player.getServerWorld().addScheduledTask(() -> {
-                    if (player.openContainer instanceof SuperBeaconContainer
-                            && player.openContainer.canInteractWith(player)) {
-                        ((SuperBeaconContainer) player.openContainer).setShowArea(message.show);
-                    }
-                });
                 return null;
             }
         }
@@ -773,47 +580,6 @@ public final class ModNetwork {
                                       MessageContext context) {
                 net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(
                         () -> StormDiagnosticLogger.setEnabled(message.enabled));
-                return null;
-            }
-        }
-    }
-
-    public static final class SuperBeaconParticlesMessage implements IMessage {
-        private BlockPos position;
-        private int type;
-
-        public SuperBeaconParticlesMessage() {
-        }
-
-        public SuperBeaconParticlesMessage(BlockPos position, int type) {
-            this.position = position;
-            this.type = type;
-        }
-
-        public BlockPos getPosition() {
-            return position;
-        }
-
-        public int getType() {
-            return type;
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buffer) {
-            position = BlockPos.fromLong(buffer.readLong());
-            type = buffer.readUnsignedByte();
-        }
-
-        @Override
-        public void toBytes(ByteBuf buffer) {
-            buffer.writeLong(position.toLong());
-            buffer.writeByte(type);
-        }
-
-        public static final class Handler implements IMessageHandler<SuperBeaconParticlesMessage, IMessage> {
-            @Override
-            public IMessage onMessage(SuperBeaconParticlesMessage message, MessageContext context) {
-                WitherStormMod.proxy.handleSuperBeaconParticles(message.position, message.type);
                 return null;
             }
         }
@@ -960,77 +726,6 @@ public final class ModNetwork {
             public IMessage onMessage(CommandBlockTickParticlesMessage message,
                                       MessageContext context) {
                 WitherStormMod.proxy.handleCommandBlockTickParticles(message);
-                return null;
-            }
-        }
-    }
-
-    public static final class DistantSuperBeaconMessage implements IMessage {
-        private BlockPos position;
-        private int red;
-        private int green;
-        private int blue;
-        private boolean active;
-        private int beamHeight;
-        private float thickness;
-        private float outerThickness;
-        private boolean removed;
-
-        public DistantSuperBeaconMessage() {
-        }
-
-        public DistantSuperBeaconMessage(BlockPos position, int[] color,
-                                         boolean active, int beamHeight, float thickness,
-                                         float outerThickness, boolean removed) {
-            this.position = position;
-            red = color[0];
-            green = color[1];
-            blue = color[2];
-            this.active = active;
-            this.beamHeight = beamHeight;
-            this.thickness = thickness;
-            this.outerThickness = outerThickness;
-            this.removed = removed;
-        }
-
-        public BlockPos getPosition() { return position; }
-        public int[] getColor() { return new int[] {red, green, blue}; }
-        public boolean isActive() { return active; }
-        public int getBeamHeight() { return beamHeight; }
-        public float getThickness() { return thickness; }
-        public float getOuterThickness() { return outerThickness; }
-        public boolean isRemoved() { return removed; }
-
-        @Override
-        public void fromBytes(ByteBuf buffer) {
-            position = BlockPos.fromLong(buffer.readLong());
-            red = buffer.readUnsignedByte();
-            green = buffer.readUnsignedByte();
-            blue = buffer.readUnsignedByte();
-            active = buffer.readBoolean();
-            beamHeight = buffer.readInt();
-            thickness = buffer.readFloat();
-            outerThickness = buffer.readFloat();
-            removed = buffer.readBoolean();
-        }
-
-        @Override
-        public void toBytes(ByteBuf buffer) {
-            buffer.writeLong(position.toLong());
-            buffer.writeByte(red);
-            buffer.writeByte(green);
-            buffer.writeByte(blue);
-            buffer.writeBoolean(active);
-            buffer.writeInt(beamHeight);
-            buffer.writeFloat(thickness);
-            buffer.writeFloat(outerThickness);
-            buffer.writeBoolean(removed);
-        }
-
-        public static final class Handler implements IMessageHandler<DistantSuperBeaconMessage, IMessage> {
-            @Override
-            public IMessage onMessage(DistantSuperBeaconMessage message, MessageContext context) {
-                WitherStormMod.proxy.handleDistantSuperBeacon(message);
                 return null;
             }
         }
@@ -1469,45 +1164,4 @@ public final class ModNetwork {
         }
     }
 
-    public static final class SuperBeaconValidEffectsMessage implements IMessage {
-        private final Set<Potion> effects = new HashSet<Potion>();
-
-        public SuperBeaconValidEffectsMessage() {
-        }
-
-        public SuperBeaconValidEffectsMessage(Set<Potion> effects) {
-            if (effects != null) this.effects.addAll(effects);
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buffer) {
-            effects.clear();
-            int count = buffer.readUnsignedByte();
-            for (int index = 0; index < count; index++) {
-                Potion effect = Potion.getPotionById(buffer.readInt());
-                if (effect != null) effects.add(effect);
-            }
-        }
-
-        @Override
-        public void toBytes(ByteBuf buffer) {
-            int count = Math.min(255, effects.size());
-            buffer.writeByte(count);
-            int written = 0;
-            for (Potion effect : effects) {
-                if (written++ >= count) break;
-                buffer.writeInt(Potion.getIdFromPotion(effect));
-            }
-        }
-
-        public static final class Handler
-                implements IMessageHandler<SuperBeaconValidEffectsMessage, IMessage> {
-            @Override
-            public IMessage onMessage(SuperBeaconValidEffectsMessage message,
-                                      MessageContext context) {
-                WitherStormMod.proxy.handleSuperBeaconValidEffects(message.effects);
-                return null;
-            }
-        }
-    }
 }

@@ -3,8 +3,6 @@ package com.wdcftgg.witherstormmod.common.init;
 import com.wdcftgg.witherstormmod.Tags;
 import com.wdcftgg.witherstormmod.common.block.TaintedButtonBlock;
 import com.wdcftgg.witherstormmod.common.block.AxisBlock;
-import com.wdcftgg.witherstormmod.common.block.SuperBeaconBlock;
-import com.wdcftgg.witherstormmod.common.block.SuperSupportBeaconBlock;
 import com.wdcftgg.witherstormmod.common.block.FireworkBundleBlock;
 import com.wdcftgg.witherstormmod.common.block.TaintedTorchBlock;
 import com.wdcftgg.witherstormmod.common.block.TaintedStandingSignBlock;
@@ -197,12 +195,6 @@ public final class ModBlocks {
         if ("formidibomb".equals(name)) {
             return new FormidibombBlock(name);
         }
-        if ("super_beacon".equals(name)) {
-            return new SuperBeaconBlock(name);
-        }
-        if ("super_support_beacon".equals(name)) {
-            return new SuperSupportBeaconBlock(name);
-        }
         if ("firework_bundle".equals(name)) {
             return new FireworkBundleBlock(name);
         }
@@ -354,8 +346,6 @@ public final class ModBlocks {
 
     private static Item createRarityBlockItem(Block block, String name) {
         if ("super_tnt".equals(name)) return new RarityBlockItem(block, EnumRarity.RARE);
-        if ("super_beacon".equals(name)) return new RarityBlockItem(block, EnumRarity.EPIC);
-        if ("super_support_beacon".equals(name)) return new RarityBlockItem(block, EnumRarity.RARE);
         if ("tainted_dust".equals(name)) return new RarityBlockItem(block, EnumRarity.UNCOMMON);
         if ("withered_phlegm_block".equals(name)) return new RarityBlockItem(block, EnumRarity.UNCOMMON);
         if (name.startsWith("tainted_zombie_") || name.startsWith("tainted_skeleton_")

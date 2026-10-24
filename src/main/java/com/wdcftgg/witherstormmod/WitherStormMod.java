@@ -7,7 +7,6 @@ import com.wdcftgg.witherstormmod.common.capability.WitherSicknessCapability;
 import com.wdcftgg.witherstormmod.common.command.WitherStormAdminCommand;
 import com.wdcftgg.witherstormmod.common.command.WitherStormSelectorHandler;
 import com.wdcftgg.witherstormmod.common.compat.CrossbowCompatibilityBootstrap;
-import com.wdcftgg.witherstormmod.common.entity.SymbiontSpells;
 import com.wdcftgg.witherstormmod.common.init.ModBlocks;
 import com.wdcftgg.witherstormmod.common.init.ModAttributes;
 import com.wdcftgg.witherstormmod.common.init.ModCreatureAttributes;
@@ -15,11 +14,9 @@ import com.wdcftgg.witherstormmod.common.init.ModEntities;
 import com.wdcftgg.witherstormmod.common.init.ModEffects;
 import com.wdcftgg.witherstormmod.common.init.ModItems;
 import com.wdcftgg.witherstormmod.common.init.ModPaintings;
-import com.wdcftgg.witherstormmod.common.init.ModPotionTypes;
 import com.wdcftgg.witherstormmod.common.init.ModRecipes;
 import com.wdcftgg.witherstormmod.common.init.ModTileEntities;
 import com.wdcftgg.witherstormmod.common.init.ModSounds;
-import com.wdcftgg.witherstormmod.common.init.ModStats;
 import com.wdcftgg.witherstormmod.common.loot.LootConditions;
 import com.wdcftgg.witherstormmod.common.loot.LootFunctions;
 import com.wdcftgg.witherstormmod.common.loot.ExternalLootTables;
@@ -33,7 +30,6 @@ import com.wdcftgg.witherstormmod.common.resource.UpstreamItemTags;
 import com.wdcftgg.witherstormmod.common.taint.TaintingData;
 import com.wdcftgg.witherstormmod.common.world.BowelsDimensions;
 import com.wdcftgg.witherstormmod.common.world.ChunkLoadingManager;
-import com.wdcftgg.witherstormmod.common.world.WitherStormSpawnManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -42,7 +38,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -107,18 +102,15 @@ public class WitherStormMod {
         ModNetwork.register();
         BowelsDimensions.register();
         ChunkLoadingManager.INSTANCE.register(this);
-        GameRegistry.registerWorldGenerator(WitherStormSpawnManager.INSTANCE, 0);
         ModBlocks.bootstrap();
         ModItems.bootstrap();
         ModEffects.bootstrap();
-        ModPotionTypes.bootstrap();
         ModSounds.bootstrap();
         ModAttributes.bootstrap();
         ModCreatureAttributes.bootstrap();
         ModEntities.register();
         ModCriteriaTriggers.register();
         ModTileEntities.register();
-        ModStats.register();
         ModPaintings.register();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new ModGuiHandler());
         proxy.preInit(event);
@@ -128,9 +120,7 @@ public class WitherStormMod {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         ModRecipes.registerSmelting();
-        ModRecipes.registerAnvil();
         ModRecipes.registerStonecutting();
-        ModRecipes.registerBrewing();
         proxy.init(event);
     }
 

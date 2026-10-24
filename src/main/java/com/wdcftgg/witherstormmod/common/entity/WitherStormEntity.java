@@ -1092,19 +1092,6 @@ public class WitherStormEntity extends EntityMob
     }
 
 
-    public void initializeFromSuperBeacon(int phase) {
-        applyResummonedEvolutionModifier();
-        setPhase(MathHelper.clamp(phase, 0, 7));
-        dataManager.set(INVULNERABLE_TICKS, 0);
-        dataManager.set(STARTING_INVULNERABLE_TICKS, Math.max(1, WitherStormConfig.invulnerabilityTime * 20));
-        recentlyRevivedTicks = 1;
-        resummoned = true;
-        dataManager.set(PLAY_DEAD_STATE, PlayDeadState.NORMAL_BEHAVIOR.ordinal());
-        stateTicks = 0;
-        dataManager.set(PLAY_DEAD_STATE_TICKS, 0);
-        missingCommandBlockTicks = 0;
-    }
-
     public int getSubPhaseRequirement(int phase) {
         int previous = phase == 0 ? 0 : getConsumptionAmountForPhase(phase - 1);
         return previous + (getConsumptionAmountForPhase(phase) - previous) / 2;

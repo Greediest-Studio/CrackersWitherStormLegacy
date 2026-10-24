@@ -2291,15 +2291,11 @@ public final class SickenedEntities {
                     && "nitwit".equals(profession.getPath())) return;
 
             MerchantRecipeList offers = villager.getRecipes(null);
-            addTrade(offers, 1, ModItems.get("withered_flesh"), 16, 5);
             addTrade(offers, 1, ModItems.get("withered_bone"), 16, 5);
-            addTrade(offers, 1, ModItems.get("withered_spider_eye"), 16, 5);
 
             String professionPath = profession == null ? "" : profession.getPath();
             if ("priest".equals(professionPath)) {
                 addTrade(offers, 1, ModItems.get("tainted_dust"), 12, 2);
-            } else if ("farmer".equals(professionPath) && isFarmerCareer(villager)) {
-                addTrade(offers, 16, ModItems.get("golden_apple_stew"), 1, 30);
             } else if ("mason".equals(professionPath)) {
                 addTrade(offers, 2, ModItems.get("tainted_zombie_sitting"), 12, 20);
                 addTrade(offers, 2, ModItems.get("tainted_zombie_wall"), 12, 20);
@@ -2309,12 +2305,6 @@ public final class SickenedEntities {
                 addTrade(offers, 2, ModItems.get("tainted_skull_ceiling"), 12, 20);
             }
             villager.setRecipes(offers);
-        }
-
-        private static boolean isFarmerCareer(EntityVillager villager) {
-            NBTTagCompound data = new NBTTagCompound();
-            villager.writeEntityToNBT(data);
-            return !data.hasKey("Career", 3) || data.getInteger("Career") <= 1;
         }
 
         private static void addTrade(MerchantRecipeList offers, int emeraldCost,

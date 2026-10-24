@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.wdcftgg.witherstormmod.common.init.ModRegistryNames;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -112,6 +113,9 @@ public final class LootTableResourceConverter {
             setData.addProperty("data", 1);
             functions.add(setData);
             converted.add("functions", functions);
+        }
+        if (!ModRegistryNames.isRegisteredItem(string(converted, "name"))) {
+            return java.util.Collections.emptyList();
         }
         if (converted.has("conditions")) {
             converted.add("conditions", convertConditions(converted.getAsJsonArray("conditions")));

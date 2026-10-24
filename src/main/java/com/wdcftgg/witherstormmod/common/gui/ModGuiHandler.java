@@ -2,8 +2,6 @@ package com.wdcftgg.witherstormmod.common.gui;
 
 import com.wdcftgg.witherstormmod.WitherStormMod;
 import com.wdcftgg.witherstormmod.common.inventory.WitheredPhlegmContainer;
-import com.wdcftgg.witherstormmod.common.inventory.SuperBeaconContainer;
-import com.wdcftgg.witherstormmod.common.tile.AbstractSuperBeaconTileEntity;
 import com.wdcftgg.witherstormmod.common.tile.WitheredPhlegmTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -15,7 +13,6 @@ import javax.annotation.Nullable;
 
 public class ModGuiHandler implements IGuiHandler {
     public static final int WITHERED_PHLEGM = 0;
-    public static final int SUPER_BEACON = 1;
 
     @Nullable
     @Override
@@ -23,10 +20,6 @@ public class ModGuiHandler implements IGuiHandler {
         TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
         if (id == WITHERED_PHLEGM && tile instanceof WitheredPhlegmTileEntity) {
             return new WitheredPhlegmContainer(player.inventory, (WitheredPhlegmTileEntity) tile);
-        }
-        if (id == SUPER_BEACON && tile instanceof AbstractSuperBeaconTileEntity) {
-            AbstractSuperBeaconTileEntity beacon = (AbstractSuperBeaconTileEntity) tile;
-            return beacon.canPlayerUseItems(player) ? new SuperBeaconContainer(beacon) : null;
         }
         return null;
     }
@@ -38,9 +31,6 @@ public class ModGuiHandler implements IGuiHandler {
         if (id == WITHERED_PHLEGM && tile instanceof WitheredPhlegmTileEntity) {
             WitheredPhlegmTileEntity phlegm = (WitheredPhlegmTileEntity) tile;
             return WitherStormMod.proxy.createWitheredPhlegmGui(player, phlegm);
-        }
-        if (id == SUPER_BEACON && tile instanceof AbstractSuperBeaconTileEntity) {
-            return WitherStormMod.proxy.createSuperBeaconGui(player, (AbstractSuperBeaconTileEntity) tile);
         }
         return null;
     }

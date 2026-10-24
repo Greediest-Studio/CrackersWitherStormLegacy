@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -26,8 +25,6 @@ import java.util.Random;
 
 @SideOnly(Side.CLIENT)
 public final class CommandBlockParticle extends Particle {
-    public static final int SUPER_BEACON_RESUMMON_BURST = 0;
-    public static final int SUPER_BEACON_ITEM_BURST = 1;
     private static final ResourceLocation[] SPRITE_LOCATIONS = {
             new ResourceLocation(Tags.MOD_ID, "particle/command_block"),
             new ResourceLocation(Tags.MOD_ID, "particle/command_block_1"),
@@ -236,48 +233,6 @@ public final class CommandBlockParticle extends Particle {
     }
 
 
-    public static void spawnForSuperBeacon(World world, BlockPos beaconPos, Random random) {
-        if (world == null || !world.isRemote || beaconPos == null || random == null) return;
-        Minecraft minecraft = Minecraft.getMinecraft();
-        TextureAtlasSprite[] sprites = resolveSprites(minecraft);
-        if (sprites == null) return;
-
-        double targetX = beaconPos.getX();
-        double targetY = beaconPos.getY() + 3.0D;
-        double targetZ = beaconPos.getZ();
-        double x = targetX + random.nextGaussian();
-        double y = targetY + random.nextGaussian();
-        double z = targetZ + random.nextGaussian();
-        Vec3d velocity = new Vec3d(targetX - x, targetY - y, targetZ - z).normalize().scale(0.1D);
-        minecraft.effectRenderer.addEffect(new CommandBlockParticle(
-                world, x, y, z, velocity.x, velocity.y, velocity.z, sprites));
-    }
-
-
-    public static void spawnSuperBeaconBurst(BlockPos beaconPos, int type) {
-        Minecraft minecraft = Minecraft.getMinecraft();
-        World world = minecraft.world;
-        if (world == null || beaconPos == null) return;
-        TextureAtlasSprite[] sprites = resolveSprites(minecraft);
-        if (sprites == null) return;
-
-        Vec3d smokeCenter = getSuperBeaconBurstCenter(beaconPos, type, false);
-        Vec3d commandCenter = getSuperBeaconBurstCenter(beaconPos, type, true);
-        Random random = world.rand;
-        for (int i = 0; i < 20; i++) {
-            world.spawnParticle(EnumParticleTypes.SMOKE_LARGE,
-                    smokeCenter.x + random.nextGaussian(), smokeCenter.y + random.nextGaussian(),
-                    smokeCenter.z + random.nextGaussian(), random.nextGaussian() * 0.01D,
-                    random.nextGaussian() * 0.01D, random.nextGaussian() * 0.01D);
-        }
-        for (int i = 0; i < 50; i++) {
-            minecraft.effectRenderer.addEffect(new CommandBlockParticle(world,
-                    commandCenter.x + random.nextGaussian(), commandCenter.y + random.nextGaussian(),
-                    commandCenter.z + random.nextGaussian(), random.nextGaussian() * 0.015D,
-                    random.nextGaussian() * 0.015D, random.nextGaussian() * 0.015D, sprites));
-        }
-    }
-
 
     public static void spawnBurst(Vec3d center, int count,
                                   double spreadX, double spreadY, double spreadZ,
@@ -314,12 +269,6 @@ public final class CommandBlockParticle extends Particle {
             minecraft.effectRenderer.addEffect(new CommandBlockParticle(world,
                     x, y, z, velocityX, velocityY, velocityZ, sprites));
         }
-    }
-
-    static Vec3d getSuperBeaconBurstCenter(BlockPos beaconPos, int type, boolean commandBlockParticle) {
-        boolean itemCraft = type == SUPER_BEACON_ITEM_BURST;
-        double yOffset = itemCraft ? 2.0D : commandBlockParticle ? 3.0D : 0.0D;
-        return new Vec3d(beaconPos.getX(), beaconPos.getY() + yOffset, beaconPos.getZ());
     }
 
     private static TextureAtlasSprite[] resolveSprites(Minecraft minecraft) {

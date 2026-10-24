@@ -949,12 +949,7 @@ public final class SymbiontSpells {
         return !UpstreamBlockTags.contains(UpstreamBlockTags.TAINTED_BLOCKS, state)
                 && !UpstreamBlockTags.contains(UpstreamBlockTags.WITHER_STORM_BLOCK_BLACKLIST, state)
                 && !UpstreamBlockTags.contains(UpstreamBlockTags.SMALL_CLUSTER_BLACKLIST, state)
-                && !UpstreamBlockTags.contains("minecraft:beacon_base_blocks", state)
-                && !UpstreamBlockTags.contains(UpstreamBlockTags.RED_SUPPORT_BASE, state)
-                && !UpstreamBlockTags.contains(UpstreamBlockTags.GREEN_SUPPORT_BASE, state)
-                && !UpstreamBlockTags.contains(UpstreamBlockTags.AQUA_SUPPORT_BASE, state)
-                && !UpstreamBlockTags.contains(UpstreamBlockTags.GRAY_SUPPORT_BASE, state)
-                && !UpstreamBlockTags.contains(UpstreamBlockTags.WITHERED_BEACON_BASE, state);
+                && !UpstreamBlockTags.contains("minecraft:beacon_base_blocks", state);
     }
 
     private static void shoot(Entity projectile, double x, double y, double z, float velocity, float inaccuracy) {

@@ -9,23 +9,8 @@ public final class WitherStormConfig {
     public enum UltimateTargetingType { NEAREST, FARTHEST, GROUP, NONE, RANDOM_STROLL, RANDOM_PLAYER, RANDOMIZED, RANDOM_STROLL_NEAR_PLAYER }
     public enum ListMode { BLACKLIST, WHITELIST }
 
-    @Config.Name("autoSpawnWitherStorm")
-    @Config.Comment("Whether a Wither Storm automatically spawns from the origin platform after world creation.")
-    public static boolean autoSpawnWitherStorm = false;
-
-    @Config.Comment("是否生成或补生成主世界原点召唤平台。关闭后不会修改已有世界原点。")
-    public static boolean generateSpawnPlatform = false;
-
     @Config.Comment("是否允许骷髅头结构召唤凋灵风暴。")
     public static boolean allowStructureSummoning = false;
-
-    @Config.Comment("是否允许超级信标重新召唤凋灵风暴。普通信标功能不受影响。")
-    public static boolean allowSuperBeaconResummoning = false;
-
-    @Config.Name("autoSpawnTime")
-    @Config.Comment("Minutes before the automatically generated Wither Storm spawns.")
-    @Config.RangeInt(min = 0, max = 120)
-    public static int autoSpawnTime = 1;
 
     @Config.Name("summoningDimensionListMode")
     @Config.Comment("Whether summoningDimensions is a blacklist or whitelist. An empty blacklist allows all dimensions; an empty whitelist allows none.")
@@ -194,11 +179,6 @@ public final class WitherStormConfig {
     @Config.Comment("Preserve drops in phlegm clusters for all living mobs instead of players only.")
     public static boolean preserveDropsForAllMobs = false;
 
-    @Config.Name("resummonedPhase")
-    @Config.Comment("Phase assigned to a Wither Storm resummoned by a super beacon.")
-    @Config.RangeInt(min = 0, max = 7)
-    public static int resummonedPhase = 4;
-
     @Config.Name("shouldShowHole")
     @Config.Comment("Whether the bowels entrance hole is available at the end of phase 7.")
     public static boolean shouldShowHole = true;
@@ -214,10 +194,6 @@ public final class WitherStormConfig {
     @Config.Name("bowelsFallResistance")
     @Config.Comment("离开肠道并从高处落下时是否短暂获得最高等级抗性。")
     public static boolean bowelsFallResistance = true;
-
-    @Config.Name("amuletOverride")
-    @Config.Comment("Whether carrying an amulet forces the Wither Storm to prioritize that player.")
-    public static boolean amuletOverride = true;
 
     @Config.Name("witherStormInvulnerability")
     @Config.Comment("Whether the Wither Storm regenerates and ignores ordinary damage after phase 3.")

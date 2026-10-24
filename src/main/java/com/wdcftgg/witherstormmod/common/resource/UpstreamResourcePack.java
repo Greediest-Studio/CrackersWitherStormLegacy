@@ -1,5 +1,6 @@
 package com.wdcftgg.witherstormmod.common.resource;
 
+import com.wdcftgg.witherstormmod.common.init.ModRegistryNames;
 import net.minecraft.client.resources.FileResourcePack;
 
 import javax.imageio.ImageIO;
@@ -32,6 +33,9 @@ public class UpstreamResourcePack extends FileResourcePack {
 
     @Override
     protected InputStream getInputStreamByName(String name) throws IOException {
+        if (ModRegistryNames.isRemovedAssetResource(name)) {
+            throw new FileNotFoundException(name);
+        }
         if ("pack.mcmeta".equals(name)) {
             return new ByteArrayInputStream(PACK_METADATA);
         }
@@ -77,6 +81,9 @@ public class UpstreamResourcePack extends FileResourcePack {
 
     @Override
     public boolean hasResourceName(String name) {
+        if (ModRegistryNames.isRemovedAssetResource(name)) {
+            return false;
+        }
         if ("pack.mcmeta".equals(name)) {
             return true;
         }

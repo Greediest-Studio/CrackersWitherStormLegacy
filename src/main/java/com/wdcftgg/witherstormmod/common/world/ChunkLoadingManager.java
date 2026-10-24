@@ -4,14 +4,11 @@ import com.wdcftgg.witherstormmod.Tags;
 import com.wdcftgg.witherstormmod.WitherStormMod;
 import com.wdcftgg.witherstormmod.common.entity.WitherStormEntity;
 import com.wdcftgg.witherstormmod.common.entity.SupplementalEntities;
-import com.wdcftgg.witherstormmod.common.tile.AbstractSuperBeaconTileEntity;
 import com.wdcftgg.witherstormmod.common.config.WitherStormConfig;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeChunkManager;
@@ -47,7 +44,6 @@ public final class ChunkLoadingManager implements ForgeChunkManager.LoadingCallb
     private static final String CHUNK_Z = "Z";
     private static final int SEGMENT_RADIUS = 6;
     private static final int BOWELS_RADIUS = 3;
-    private static final int BEACON_RADIUS = 0;
     private static final long RESTORE_GRACE_TICKS = 600L;
     private static long lastProfileTick = Long.MIN_VALUE;
     private static long profileNanos;
@@ -78,6 +74,10 @@ public final class ChunkLoadingManager implements ForgeChunkManager.LoadingCallb
         for (ForgeChunkManager.Ticket ticket : tickets) {
             NBTTagCompound data = ticket.getModData();
             if (!data.getBoolean(MANAGED) || !data.hasKey(LOADER_KEY, 8)) continue;
+            if ("super_beacon".equals(data.getString(LOADER_KIND))) {
+                ForgeChunkManager.releaseTicket(ticket);
+                continue;
+            }
             String key = data.getString(LOADER_KEY);
             List<ForgeChunkManager.Ticket> loaderTickets = restored.get(key);
             if (loaderTickets == null) {
@@ -144,17 +144,6 @@ public final class ChunkLoadingManager implements ForgeChunkManager.LoadingCallb
             }
         }
 
-        for (TileEntity tile : new ArrayList<TileEntity>(
-                world.loadedTileEntityList)) {
-            if (tile instanceof AbstractSuperBeaconTileEntity
-                    && !tile.isInvalid()) {
-                ChunkPos center = new ChunkPos(tile.getPos());
-                String key = beaconKey(tile.getPos());
-                touch(world, key, "super_beacon", center.x, center.z,
-                        BEACON_RADIUS, now);
-            }
-        }
-
         if (world.provider.getDimension() == BowelsDimensions.DIMENSION_ID) {
             for (BowelsInstanceData.Instance instance : BowelsInstanceData.get(world).getInstances()) {
                 if (instance.completed) continue;
@@ -202,12 +191,6 @@ public final class ChunkLoadingManager implements ForgeChunkManager.LoadingCallb
 
     public synchronized void releaseBowelsInstance(World world, UUID stormUuid) {
         if (world instanceof WorldServer) release((WorldServer) world, bowelsKey(stormUuid));
-    }
-
-    public synchronized void releaseSuperBeacon(World world, BlockPos position) {
-        if (world instanceof WorldServer && position != null) {
-            release((WorldServer) world, beaconKey(position));
-        }
     }
 
 
@@ -328,10 +311,6 @@ public final class ChunkLoadingManager implements ForgeChunkManager.LoadingCallb
 
     static String bowelsKey(UUID stormUuid) {
         return "bowels:" + stormUuid;
-    }
-
-    static String beaconKey(BlockPos position) {
-        return "super_beacon:" + position.toLong();
     }
 
     static List<ChunkPos> createChunkPlan(int centerX, int centerZ, int radius) {

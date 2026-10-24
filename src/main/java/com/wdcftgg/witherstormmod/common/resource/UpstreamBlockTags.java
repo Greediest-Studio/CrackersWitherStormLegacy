@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.wdcftgg.witherstormmod.WitherStormMod;
+import com.wdcftgg.witherstormmod.common.init.ModRegistryNames;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAnvil;
 import net.minecraft.block.BlockBanner;
@@ -66,12 +67,6 @@ public final class UpstreamBlockTags {
             "witherstormmod:less_favorable_blocks";
     public static final String TRACTOR_BEAM_DISTRACTION_BLOCKS =
             "witherstormmod:tractor_beam_distraction_blocks";
-    public static final String BEACONS = "witherstormmod:beacons";
-    public static final String WITHERED_BEACON_BASE = "witherstormmod:withered_beacon_base";
-    public static final String AQUA_SUPPORT_BASE = "witherstormmod:aqua_support_base";
-    public static final String GREEN_SUPPORT_BASE = "witherstormmod:green_support_base";
-    public static final String GRAY_SUPPORT_BASE = "witherstormmod:gray_support_base";
-    public static final String RED_SUPPORT_BASE = "witherstormmod:red_support_base";
     public static final String BLOCK_CLUSTERS_CANNOT_PLACE =
             "witherstormmod:block_clusters_cannot_place";
     public static final String CAVE_IN_BLACKLIST =
@@ -97,7 +92,7 @@ public final class UpstreamBlockTags {
         try {
             for (String entryName : UpstreamResourceArchive.listEntries("data/", ".json")) {
                 String tagName = tagName(entryName);
-                if (tagName == null) continue;
+                if (tagName == null || isRemovedBlockTag(tagName)) continue;
                 JsonObject root;
                 try (InputStream stream = UpstreamResourceArchive.open(entryName);
                      InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
@@ -110,7 +105,14 @@ public final class UpstreamBlockTags {
                 List<String> values = new ArrayList<String>();
                 for (JsonElement element : sourceValues) {
                     String value = readTagValue(element, entryName);
-                    if (value != null) values.add(value);
+                    if (value == null) continue;
+                    if (value.startsWith("#")) {
+                        if (!isRemovedBlockTag(value.substring(1))) {
+                            values.add(value);
+                        }
+                    } else if (ModRegistryNames.isRegisteredBlock(value)) {
+                        values.add(value);
+                    }
                 }
                 loaded.put(tagName, new TagDefinition(
                         root.has("replace") && root.get("replace").getAsBoolean(), values));
@@ -125,12 +127,6 @@ public final class UpstreamBlockTags {
         requireTag(loaded, SMALL_CLUSTER_BLACKLIST);
         requireTag(loaded, LESS_FAVORABLE_BLOCKS);
         requireTag(loaded, TRACTOR_BEAM_DISTRACTION_BLOCKS);
-        requireTag(loaded, BEACONS);
-        requireTag(loaded, WITHERED_BEACON_BASE);
-        requireTag(loaded, AQUA_SUPPORT_BASE);
-        requireTag(loaded, GREEN_SUPPORT_BASE);
-        requireTag(loaded, GRAY_SUPPORT_BASE);
-        requireTag(loaded, RED_SUPPORT_BASE);
         requireTag(loaded, BLOCK_CLUSTERS_CANNOT_PLACE);
         requireTag(loaded, CAVE_IN_BLACKLIST);
         requireTag(loaded, WITHER_STORM_SUMMON_COMMAND_BLOCKS);
@@ -392,6 +388,15 @@ public final class UpstreamBlockTags {
         }
         boolean required = !object.has("required") || object.get("required").getAsBoolean();
         return required ? id.getAsString() : id.getAsString();
+    }
+
+    private static boolean isRemovedBlockTag(String tagName) {
+        return "witherstormmod:beacons".equals(tagName)
+                || "witherstormmod:withered_beacon_base".equals(tagName)
+                || "witherstormmod:aqua_support_base".equals(tagName)
+                || "witherstormmod:green_support_base".equals(tagName)
+                || "witherstormmod:gray_support_base".equals(tagName)
+                || "witherstormmod:red_support_base".equals(tagName);
     }
 
     private static void requireTag(Map<String, TagDefinition> loaded, String tagName) {

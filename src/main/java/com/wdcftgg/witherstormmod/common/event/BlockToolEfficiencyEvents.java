@@ -22,7 +22,7 @@ import java.util.Set;
 @Mod.EventBusSubscriber(modid = Tags.MOD_ID)
 public final class BlockToolEfficiencyEvents {
     private static final Set<String> PICKAXE_BLOCKS = setOf(
-            "tainted_glass", "tainted_glass_pane", "super_beacon", "super_support_beacon");
+            "tainted_glass", "tainted_glass_pane");
     private static final Set<String> AXE_BLOCKS = setOf(
             "tainted_pumpkin", "tainted_carved_pumpkin", "tainted_jack_o_lantern");
     private static final Set<String> HOE_BLOCKS = setOf(

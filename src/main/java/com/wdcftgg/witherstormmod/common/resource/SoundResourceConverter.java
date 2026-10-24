@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.wdcftgg.witherstormmod.common.init.ModRegistryNames;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -29,8 +30,6 @@ final class SoundResourceConverter {
         rewrites.put("minecraft:entity.illusioner.cast_spell",
                 "minecraft:entity.illusion_illager.cast_spell");
 
-        rewrites.put("minecraft:block.beacon.deactivate",
-                "minecraft:block.end_portal_frame.fill");
         EVENT_REWRITES = Collections.unmodifiableMap(rewrites);
 
 
@@ -52,6 +51,8 @@ final class SoundResourceConverter {
     static byte[] convert(byte[] source) {
         JsonObject definitions = JsonParser.parseString(
                 new String(source, StandardCharsets.UTF_8)).getAsJsonObject();
+        definitions.entrySet().removeIf(
+                entry -> !ModRegistryNames.isRegisteredSoundName(entry.getKey()));
         for (Map.Entry<String, JsonElement> definition : definitions.entrySet()) {
             if (!definition.getValue().isJsonObject()) continue;
             JsonObject event = definition.getValue().getAsJsonObject();

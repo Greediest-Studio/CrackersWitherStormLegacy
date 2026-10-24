@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.wdcftgg.witherstormmod.common.init.ModRegistryNames;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -21,9 +22,6 @@ final class ModelResourceConverter {
 
     private static final String MODEL_PREFIX = "assets/witherstormmod/models/";
     private static final String BLOCKSTATE_PREFIX = "assets/witherstormmod/blockstates/";
-    private static final String PHASOMETER_MODEL = MODEL_PREFIX + "item/phasometer.json";
-    private static final String PHASOMETER_GUI_MODEL = MODEL_PREFIX + "item/phasometer_gui.json";
-    private static final String PHASOMETER_SOURCE = MODEL_PREFIX + "item/phasometer.json";
     private static final String CROSSBOW_MOD_ENDER_PEARL_MODEL =
             MODEL_PREFIX + "item/crossbow_mod_ender_pearl.json";
     private static final String CROSSBOW_ENDER_PEARL_SOURCE =
@@ -79,6 +77,9 @@ final class ModelResourceConverter {
     }
 
     static boolean handles(String legacyName) {
+        if (ModRegistryNames.isRemovedAssetResource(legacyName)) {
+            return false;
+        }
         return legacyName.startsWith(MODEL_PREFIX) && legacyName.endsWith(".json")
                 || legacyName.startsWith(BLOCKSTATE_PREFIX) && legacyName.endsWith(".json");
     }
@@ -86,9 +87,6 @@ final class ModelResourceConverter {
     static String sourceName(String legacyName) {
         if (!handles(legacyName)) {
             return legacyName;
-        }
-        if (PHASOMETER_MODEL.equals(legacyName) || PHASOMETER_GUI_MODEL.equals(legacyName)) {
-            return PHASOMETER_SOURCE;
         }
         if (CROSSBOW_MOD_ENDER_PEARL_MODEL.equals(legacyName)) {
             return CROSSBOW_ENDER_PEARL_SOURCE;
@@ -101,24 +99,13 @@ final class ModelResourceConverter {
             JsonObject root = JsonParser.parseString(
                     new String(source, StandardCharsets.UTF_8)).getAsJsonObject();
             if (legacyName.startsWith(MODEL_PREFIX)) {
-                if (PHASOMETER_MODEL.equals(legacyName)) {
-                    root = requiredObject(root, "base", legacyName);
-                } else if (PHASOMETER_GUI_MODEL.equals(legacyName)) {
-                    JsonObject perspectives = requiredObject(root, "perspectives", legacyName);
-                    root = requiredObject(perspectives, "gui", legacyName);
-                } else if (CROSSBOW_MOD_ENDER_PEARL_MODEL.equals(legacyName)) {
-
-
+                if (CROSSBOW_MOD_ENDER_PEARL_MODEL.equals(legacyName)) {
                     root.addProperty("parent", "crossbow:block/template");
                     JsonObject textures = getOrCreateObject(root, "textures");
                     textures.addProperty(
                             "layer0", "witherstormmod:items/crossbow_mod_ender_pearl");
                 }
                 convertModel(root);
-                if (PHASOMETER_MODEL.equals(legacyName)) {
-                    JsonObject textures = getOrCreateObject(root, "textures");
-                    textures.addProperty("particle", "witherstormmod:items/phasometer_model");
-                }
             } else {
                 root = convertBlockState(legacyName, root);
             }
@@ -445,15 +432,6 @@ final class ModelResourceConverter {
 
     private static JsonObject object(JsonElement value) {
         return value != null && value.isJsonObject() ? value.getAsJsonObject() : null;
-    }
-
-    private static JsonObject requiredObject(JsonObject parent, String key, String legacyName) {
-        JsonObject value = object(parent.get(key));
-        if (value == null) {
-            throw new IllegalArgumentException(
-                    "Missing " + key + " in upstream phasometer model for " + legacyName);
-        }
-        return value.deepCopy();
     }
 
     private static JsonArray array(JsonElement value) {

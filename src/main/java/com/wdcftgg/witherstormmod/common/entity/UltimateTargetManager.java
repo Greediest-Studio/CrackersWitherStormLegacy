@@ -2,8 +2,6 @@ package com.wdcftgg.witherstormmod.common.entity;
 
 import com.wdcftgg.witherstormmod.api.common.event.WitherStormFindUltimateTargetEvent;
 import com.wdcftgg.witherstormmod.common.config.WitherStormConfig;
-import com.wdcftgg.witherstormmod.common.init.ModItems;
-import com.wdcftgg.witherstormmod.common.resource.UpstreamItemTags;
 import com.wdcftgg.witherstormmod.common.util.WorldUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -11,7 +9,6 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.nbt.NBTTagCompound;
@@ -280,20 +277,6 @@ public final class UltimateTargetManager {
     @Nullable
     public EntityLivingBase findUltimateTarget(List<EntityPlayer> players) {
         EntityLivingBase override = null;
-        EntityPlayer amuletTarget = null;
-        double amuletDistance = Double.MAX_VALUE;
-        Item amulet = ModItems.get("amulet");
-        if (WitherStormConfig.amuletOverride && amulet != null) {
-            for (EntityPlayer player : players) {
-                if (!isUltimateTargetCandidate(player) || !hasItemInMainInventory(player, amulet)) continue;
-                double distance = storm.getDistanceSq(player);
-                if (distance < amuletDistance) {
-                    amuletDistance = distance;
-                    amuletTarget = player;
-                }
-            }
-        }
-        if (amuletTarget != null) override = amuletTarget;
 
         EntityLivingBase explicitOverride = resolveOverride();
         if (isExplicitOverrideCandidate(explicitOverride)) override = explicitOverride;
@@ -524,11 +507,6 @@ public final class UltimateTargetManager {
         double deltaX = first.x - second.x;
         double deltaZ = first.z - second.z;
         return Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
-    }
-
-    private boolean hasItemInMainInventory(EntityPlayer player, Item item) {
-        for (ItemStack stack : player.inventory.mainInventory) if (!stack.isEmpty() && stack.getItem() == item) return true;
-        return false;
     }
 
     private boolean carriesCommandBlockTool(List<EntityPlayer> players) {

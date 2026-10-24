@@ -1,8 +1,6 @@
 package com.wdcftgg.witherstormmod.common.init;
 
 import com.wdcftgg.witherstormmod.Tags;
-import com.wdcftgg.witherstormmod.common.tile.SuperBeaconTileEntity;
-import com.wdcftgg.witherstormmod.common.tile.SuperSupportBeaconTileEntity;
 import com.wdcftgg.witherstormmod.common.tile.FireworkBundleTileEntity;
 import com.wdcftgg.witherstormmod.common.tile.TaintedSignTileEntity;
 import com.wdcftgg.witherstormmod.common.tile.FormidibombTileEntity;
@@ -16,8 +14,6 @@ public final class ModTileEntities {
     }
 
     public static void register() {
-        GameRegistry.registerTileEntity(SuperBeaconTileEntity.class, new ResourceLocation(Tags.MOD_ID, "super_beacon"));
-        GameRegistry.registerTileEntity(SuperSupportBeaconTileEntity.class, new ResourceLocation(Tags.MOD_ID, "super_support_beacon"));
         GameRegistry.registerTileEntity(FireworkBundleTileEntity.class, new ResourceLocation(Tags.MOD_ID, "firework_bundle"));
         GameRegistry.registerTileEntity(TaintedSignTileEntity.class, new ResourceLocation(Tags.MOD_ID, "tainted_sign"));
         GameRegistry.registerTileEntity(FormidibombTileEntity.class, new ResourceLocation(Tags.MOD_ID, "formidibomb"));

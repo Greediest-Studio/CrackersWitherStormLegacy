@@ -109,7 +109,7 @@ public final class TaintedStatueBlock extends BlockHorizontal {
         for (int roll = 0; roll < 2; roll++) {
             if (zombie) {
                 if (random.nextBoolean()) {
-                    drops.add(new ItemStack(ModItems.get("withered_flesh"), 1 + random.nextInt(2)));
+                    drops.add(new ItemStack(ModItems.get("withered_bone"), 1 + random.nextInt(2)));
                 } else {
                     drops.add(new ItemStack(ModItems.get("withered_bone")));
                 }
