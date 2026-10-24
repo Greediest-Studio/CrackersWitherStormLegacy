@@ -535,7 +535,7 @@ public final class UltimateTargetManager {
         for (EntityPlayer player : players) {
             for (ItemStack stack : player.inventory.mainInventory) {
                 if (!stack.isEmpty()
-                        && UpstreamItemTags.contains(UpstreamItemTags.COMMAND_BLOCK_TOOLS, stack)) return true;
+                        && com.wdcftgg.witherstormmod.api.common.registry.CommandBlockTools.contains(stack)) return true;
             }
         }
         return false;

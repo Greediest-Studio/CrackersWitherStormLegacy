@@ -1911,7 +1911,7 @@ public final class SupplementalEntities {
         }
 
         private static boolean isCommandBlockTool(ItemStack stack) {
-            return UpstreamItemTags.contains(UpstreamItemTags.COMMAND_BLOCK_TOOLS, stack)
+            return com.wdcftgg.witherstormmod.api.common.registry.CommandBlockTools.contains(stack)
                     || isLegacyCommandBlockTool(stack);
         }
 

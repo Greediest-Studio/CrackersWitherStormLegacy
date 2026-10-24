@@ -38,7 +38,7 @@ public final class WitherStormSpawnManager implements IWorldGenerator {
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator,
                          IChunkProvider chunkProvider) {
-        if (world.isRemote || world.provider.getDimension() != OVERWORLD || chunkX != 0 || chunkZ != 0
+        if (!WitherStormConfig.generateSpawnPlatform || world.isRemote || world.provider.getDimension() != OVERWORLD || chunkX != 0 || chunkZ != 0
                 || !world.getWorldInfo().isMapFeaturesEnabled()) return;
         WitherStormSpawnData data = WitherStormSpawnData.get(world);
         generateStartingStructure(world, data, "chunk generation");
@@ -117,6 +117,7 @@ public final class WitherStormSpawnManager implements IWorldGenerator {
     }
 
     private void recoverMissingStartingStructure(WorldServer world, WitherStormSpawnData data) {
+        if (!WitherStormConfig.generateSpawnPlatform) return;
         if (data.isPlatformGenerated() && data.getSpawnPosition() != null) return;
         if (!world.getWorldInfo().isMapFeaturesEnabled()
                 || world.getTotalWorldTime() % PLATFORM_RECOVERY_INTERVAL != 0L) return;

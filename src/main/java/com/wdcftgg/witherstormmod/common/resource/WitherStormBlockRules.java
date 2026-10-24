@@ -19,6 +19,19 @@ public final class WitherStormBlockRules {
     private WitherStormBlockRules() {
     }
 
+    public static boolean canConsume(com.wdcftgg.witherstormmod.common.entity.WitherStormEntity storm,
+                                     IBlockState state) {
+        // 只给基岩扩展维度资格；其余方块继续使用已缓存的标签与配置判断。
+        if (state != null && state.getBlock() == Blocks.BEDROCK) {
+            com.wdcftgg.witherstormmod.api.common.event.WitherStormConsumeBlockEvent event =
+                    new com.wdcftgg.witherstormmod.api.common.event.WitherStormConsumeBlockEvent(storm, state);
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
+            if (event.getResult() == net.minecraftforge.fml.common.eventhandler.Event.Result.ALLOW) return true;
+            if (event.getResult() == net.minecraftforge.fml.common.eventhandler.Event.Result.DENY) return false;
+        }
+        return canConsume(state);
+    }
+
     public static boolean canConsume(IBlockState state) {
         if (state == null || state.getBlock() == Blocks.AIR) return false;
         refreshCacheIfNeeded();

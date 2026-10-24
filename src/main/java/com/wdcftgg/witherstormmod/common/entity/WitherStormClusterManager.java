@@ -59,7 +59,9 @@ final class WitherStormClusterManager {
             SupplementalEntities.BlockClusterEntity cluster =
                     new SupplementalEntities.BlockClusterEntity(source.world);
             cluster.populateWithRadius(center, 3.0F + random.nextFloat() * 2.0F,
-                    (world, position, state) -> !isBlacklisted(state));
+                    (world, position, state) -> source instanceof WitherStormEntity
+                            ? WitherStormBlockRules.canConsume((WitherStormEntity) source, state)
+                            : WitherStormBlockRules.canConsume(state));
             if (cluster.getBlocks().isEmpty()) continue;
             cluster.setRotationDelta(random.nextInt(20) * 0.05F,
                     random.nextInt(20) * 0.05F);
@@ -330,6 +332,7 @@ final class WitherStormClusterManager {
     }
 
     private boolean isInvalidInitialBlock(Source source, IBlockState state) {
+        if (state.getBlock() == Blocks.BEDROCK && WitherStormBlockRules.canConsume(storm, state)) return false;
         if (source == Source.SMALL) {
             return UpstreamBlockTags.contains(UpstreamBlockTags.LESS_FAVORABLE_BLOCKS, state)
                     && storm.getRNG().nextDouble() <= 0.9D;
@@ -341,6 +344,7 @@ final class WitherStormClusterManager {
 
     private boolean isValidClusterBlock(Source source, IBlockState state) {
         if (isBlacklisted(state)) return false;
+        if (state.getBlock() == Blocks.BEDROCK) return true;
         if (source == Source.SMALL) {
             return !UpstreamBlockTags.contains(UpstreamBlockTags.SMALL_CLUSTER_BLACKLIST, state);
         }
@@ -350,8 +354,8 @@ final class WitherStormClusterManager {
         return true;
     }
 
-    private static boolean isBlacklisted(IBlockState state) {
-        return !WitherStormBlockRules.canConsume(state);
+    private boolean isBlacklisted(IBlockState state) {
+        return !WitherStormBlockRules.canConsume(storm, state);
     }
 
     private boolean hasNearbySymbiont(BlockPos position) {

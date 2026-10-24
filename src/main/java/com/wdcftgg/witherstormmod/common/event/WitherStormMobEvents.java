@@ -61,8 +61,7 @@ public final class WitherStormMobEvents {
         if (!event.getWorld().isRemote && entity instanceof WitherStormEntity) {
             WitherStormEntity storm = (WitherStormEntity) entity;
             if (!storm.wasRestoredFromPersistentData()
-                    && !WitherStormConfig.isSummoningDimensionAllowed(
-                    event.getWorld().provider.getDimension())) {
+                    && !WitherStormConfig.isSummoningDimensionAllowed(event.getWorld().provider.getDimension())) {
                 event.setCanceled(true);
                 return;
             }

@@ -215,8 +215,8 @@ public class SuperBeaconTileEntity extends AbstractSuperBeaconTileEntity impleme
         resummonTicks++;
         updateResummonShake();
         boolean witherStorm = SuperBeaconLogic.isWitherStormResummon(resummoningEntity);
-        if (witherStorm && !WitherStormConfig.isSummoningDimensionAllowed(
-                world.provider.getDimension())) {
+        if (witherStorm && (!WitherStormConfig.allowSuperBeaconResummoning
+                || !WitherStormConfig.isSummoningDimensionAllowed(world.provider.getDimension()))) {
             cancelWitherStormResummon();
             return;
         }
@@ -378,7 +378,8 @@ public class SuperBeaconTileEntity extends AbstractSuperBeaconTileEntity impleme
     }
 
     private void finishWitherStormResummon() {
-        if (!WitherStormConfig.isSummoningDimensionAllowed(world.provider.getDimension())) {
+        if (!WitherStormConfig.allowSuperBeaconResummoning
+                || !WitherStormConfig.isSummoningDimensionAllowed(world.provider.getDimension())) {
             cancelWitherStormResummon();
             return;
         }

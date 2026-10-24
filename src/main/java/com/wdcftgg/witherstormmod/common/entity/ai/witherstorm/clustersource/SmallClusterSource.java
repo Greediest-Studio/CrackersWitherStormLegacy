@@ -48,12 +48,15 @@ public final class SmallClusterSource extends BlockClusterSource {
 
     @Override
     protected boolean isValidClusterBlock(WitherStormEntity storm, IBlockState state) {
+        if (state.getBlock() == net.minecraft.init.Blocks.BEDROCK) return super.isValidClusterBlock(storm, state);
         return super.isValidClusterBlock(storm, state)
                 && !UpstreamBlockTags.contains(UpstreamBlockTags.SMALL_CLUSTER_BLACKLIST, state);
     }
 
     @Override
     protected boolean isInvalidInitialStartBlock(WitherStormEntity storm, IBlockState state) {
+        if (state.getBlock() == net.minecraft.init.Blocks.BEDROCK
+                && super.isValidClusterBlock(storm, state)) return false;
         return UpstreamBlockTags.contains(UpstreamBlockTags.LESS_FAVORABLE_BLOCKS, state)
                 && storm.getRNG().nextDouble() <= 0.9D;
     }

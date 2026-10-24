@@ -2359,7 +2359,7 @@ public class WitherStormEntity extends EntityMob
     static boolean isProtectedFromConsumption(ItemStack stack) {
         return stack.getItem() == ModItems.get("command_block_book")
                 || stack.getItem() == ModItems.get("withered_nether_star")
-                || UpstreamItemTags.contains(UpstreamItemTags.COMMAND_BLOCK_TOOLS, stack);
+                || com.wdcftgg.witherstormmod.api.common.registry.CommandBlockTools.contains(stack);
     }
 
     void captureConsumedPet(EntityLivingBase living) {
@@ -2517,7 +2517,7 @@ public class WitherStormEntity extends EntityMob
             IBlockState candidateState = world.getBlockState(candidate);
             if (candidateState.getBlock() == Blocks.AIR
                     || !WorldUtil.isBlockExposed(world, candidate)
-                    || !WitherStormBlockRules.canConsume(candidateState)) continue;
+                    || !WitherStormBlockRules.canConsume(this, candidateState)) continue;
             if (WitherStormConfig.onlyTryPickingUpTractorTagged
                     && !UpstreamBlockTags.contains(
                     UpstreamBlockTags.TRACTOR_BEAM_DISTRACTION_BLOCKS, candidateState)) continue;
@@ -2527,7 +2527,7 @@ public class WitherStormEntity extends EntityMob
             float clusterRadius = getTractorBeamClusterRadius(random);
             SupplementalEntities.BlockClusterEntity cluster = new SupplementalEntities.BlockClusterEntity(world);
             cluster.populateWithRadius(candidate, clusterRadius,
-                    (level, position, state) -> WitherStormBlockRules.canConsume(state));
+                    (level, position, state) -> WitherStormBlockRules.canConsume(this, state));
             if (cluster.getBlocks().isEmpty()) continue;
             cluster.setTime(time);
             if (random.nextInt(3) == 0) {
@@ -3609,6 +3609,10 @@ public class WitherStormEntity extends EntityMob
         onDeath(source);
     }
 
+    public void suppressFinalDeathLoot() {
+        getEntityData().setBoolean("WitherStormSuppressFinalStar", true);
+    }
+
     private void releaseFinalDeathLoot() {
         if (deathLootReleased) return;
         deathLootReleased = true;
@@ -3623,7 +3627,7 @@ public class WitherStormEntity extends EntityMob
         star.motionY = -0.08D;
         star.motionZ = 0.0D;
         star.setNoGravity(true);
-        world.spawnEntity(star);
+        if (!getEntityData().getBoolean("WitherStormSuppressFinalStar")) world.spawnEntity(star);
 
         int remainingExperience = ForgeEventFactory.getExperienceDrop(this, attackingPlayer, experienceValue);
         while (remainingExperience > 0) {

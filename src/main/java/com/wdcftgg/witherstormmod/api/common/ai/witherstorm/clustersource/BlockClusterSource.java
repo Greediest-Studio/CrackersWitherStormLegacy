@@ -73,7 +73,7 @@ public abstract class BlockClusterSource {
     }
 
     protected boolean isValidClusterBlock(WitherStormEntity storm, IBlockState state) {
-        return WitherStormBlockRules.canConsume(state);
+        return WitherStormBlockRules.canConsume(storm, state);
     }
 
     protected abstract int getPickupInterval(WitherStormEntity storm);
@@ -134,7 +134,7 @@ public abstract class BlockClusterSource {
                 candidate = new BlockPos(candidate.getX(), randomY, candidate.getZ());
                 state = storm.world.getBlockState(candidate);
                 if (isAirOrWater(storm.world, candidate, state)
-                        || !WitherStormBlockRules.canConsume(state)) {
+                        || !WitherStormBlockRules.canConsume(storm, state)) {
                     candidate = originalCandidate;
                     state = originalState;
                 }

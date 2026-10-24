@@ -182,7 +182,7 @@ public final class BowelsBossfightController {
         BowelsInstanceData.Instance instance = data.findContaining(core.getPosition());
         if (instance == null || instance.completed || instance.bossPhase == 17) return;
         Entity killer = source == null ? null : source.getTrueSource();
-        instance.killerUuid = killer == null ? null : killer.getUniqueID();
+        instance.killerUuid = killer instanceof EntityPlayerMP ? killer.getUniqueID() : null;
         finishPhase(world, core, instance, instance.bossPhase);
         instance.bossPhase = 17;
         instance.bossPhaseTicks = 0;
@@ -617,8 +617,9 @@ public final class BowelsBossfightController {
                                      BowelsInstanceData.Instance instance) {
         WitherStormEntity storm = findStorm(bowels, instance.stormUuid);
         Entity killer = findEntity(bowels, instance.killerUuid);
+        List<EntityPlayerMP> participants = playersNear(bowels, core, 150.0D);
         if (storm != null && !storm.isDead) storm.finishBowelsDeath(killer);
-        for (EntityPlayerMP player : playersNear(bowels, core, 150.0D)) {
+        for (EntityPlayerMP player : participants) {
             if (storm != null && player != killer) player.onKillEntity(storm);
             if (player.getSpawnDimension() == BowelsDimensions.DIMENSION_ID) {
                 player.setSpawnChunk(null, false, BowelsDimensions.DIMENSION_ID);
@@ -641,6 +642,16 @@ public final class BowelsBossfightController {
                         player.posX, player.posY, player.posZ, 1.0F, 1.0F));
             }
             placePlayerNearStorm(player, storm);
+        }
+        // 返回原维度后再发奖，背包溢出的掉落物留在玩家脚边。
+        if (storm != null) {
+            EntityPlayerMP winningPlayer = killer instanceof EntityPlayerMP ? (EntityPlayerMP) killer : null;
+            if (winningPlayer != null && !participants.contains(winningPlayer)) participants.add(winningPlayer);
+            com.wdcftgg.witherstormmod.api.common.event.WitherStormVictoryEvent victory =
+                    new com.wdcftgg.witherstormmod.api.common.event.WitherStormVictoryEvent(storm,
+                            winningPlayer, participants);
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(victory);
+            if (victory.handlesLoot()) storm.suppressFinalDeathLoot();
         }
         instance.bossPhase = 18;
         instance.bossPhaseTicks = 0;
@@ -778,8 +789,7 @@ public final class BowelsBossfightController {
     private static boolean isCommandBlockTool(DamageSource source) {
         if (!(source.getTrueSource() instanceof EntityLivingBase)) return false;
         EntityLivingBase attacker = (EntityLivingBase) source.getTrueSource();
-        return UpstreamItemTags.contains(UpstreamItemTags.COMMAND_BLOCK_TOOLS,
-                attacker.getHeldItemMainhand());
+        return com.wdcftgg.witherstormmod.api.common.registry.CommandBlockTools.contains(attacker.getHeldItemMainhand());
     }
 
     private static boolean isVulnerablePhase(int phase) {

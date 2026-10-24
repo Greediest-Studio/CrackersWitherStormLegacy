@@ -13,6 +13,15 @@ public final class WitherStormConfig {
     @Config.Comment("Whether a Wither Storm automatically spawns from the origin platform after world creation.")
     public static boolean autoSpawnWitherStorm = false;
 
+    @Config.Comment("是否生成或补生成主世界原点召唤平台。关闭后不会修改已有世界原点。")
+    public static boolean generateSpawnPlatform = false;
+
+    @Config.Comment("是否允许骷髅头结构召唤凋灵风暴。")
+    public static boolean allowStructureSummoning = false;
+
+    @Config.Comment("是否允许超级信标重新召唤凋灵风暴。普通信标功能不受影响。")
+    public static boolean allowSuperBeaconResummoning = false;
+
     @Config.Name("autoSpawnTime")
     @Config.Comment("Minutes before the automatically generated Wither Storm spawns.")
     @Config.RangeInt(min = 0, max = 120)
