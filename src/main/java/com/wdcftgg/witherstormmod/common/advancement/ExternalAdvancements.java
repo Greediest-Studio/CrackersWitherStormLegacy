@@ -5,7 +5,7 @@ import com.google.gson.JsonParser;
 import com.wdcftgg.witherstormmod.Tags;
 import com.wdcftgg.witherstormmod.WitherStormMod;
 import com.wdcftgg.witherstormmod.common.resource.AdvancementResourceConverter;
-import com.wdcftgg.witherstormmod.common.resource.UpstreamResourceArchive;
+import com.wdcftgg.witherstormmod.common.resource.BundledResources;
 import net.minecraft.server.MinecraftServer;
 
 import java.io.ByteArrayInputStream;
@@ -41,10 +41,11 @@ public final class ExternalAdvancements {
         Map<String, JsonObject> convertedMain = new LinkedHashMap<String, JsonObject>();
         Set<String> keptMainIds = new LinkedHashSet<String>();
 
-        for (String relativeName : AdvancementResourceConverter.ALL_MAIN_ADVANCEMENTS) {
+        // 导入时已将父节点重连到保留的祖先，只读取仍启用的进度。
+        for (String relativeName : AdvancementResourceConverter.MAIN_CHAIN) {
             String entryName = AdvancementResourceConverter.sourceEntry(relativeName);
             byte[] rawBytes;
-            try (InputStream source = UpstreamResourceArchive.open(entryName)) {
+            try (InputStream source = BundledResources.open(entryName)) {
                 rawBytes = source.readAllBytes();
             }
             String id = AdvancementResourceConverter.advancementId(relativeName);
@@ -77,13 +78,13 @@ public final class ExternalAdvancements {
                     AdvancementResourceConverter.serialize(converted)));
         }
 
-        for (String entryName : UpstreamResourceArchive.listEntries(
+        for (String entryName : BundledResources.listEntries(
                 AdvancementResourceConverter.ADVANCEMENT_PREFIX, ".json")) {
             String relativeName = entryName.substring(
                     AdvancementResourceConverter.ADVANCEMENT_PREFIX.length());
             if (!relativeName.startsWith("recipes/")) continue;
             JsonObject converted;
-            try (InputStream source = UpstreamResourceArchive.open(entryName)) {
+            try (InputStream source = BundledResources.open(entryName)) {
                 converted = AdvancementResourceConverter.convertRecipeAdvancement(entryName, source);
             }
             if (converted == null) continue;
@@ -99,7 +100,7 @@ public final class ExternalAdvancements {
         for (Map.Entry<File, GeneratedAdvancement> entry : generated.entrySet()) {
             writeAtomically(entry.getKey(), entry.getValue().json);
         }
-        WitherStormMod.LOGGER.info("Prepared {} advancements from the external Wither Storm archive",
+        WitherStormMod.LOGGER.info("Prepared {} advancements from the bundled Wither Storm resources",
                 generated.size());
         return generated.size();
     }

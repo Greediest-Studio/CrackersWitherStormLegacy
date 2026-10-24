@@ -1,0 +1,1 @@
+{"variants":{"facing=east":{"model":"witherstormmod:block/tainted_wall_torch"},"facing=north":{"model":"witherstormmod:block/tainted_wall_torch","y":270},"facing=south":{"model":"witherstormmod:block/tainted_wall_torch","y":90},"facing=west":{"model":"witherstormmod:block/tainted_wall_torch","y":180}}}

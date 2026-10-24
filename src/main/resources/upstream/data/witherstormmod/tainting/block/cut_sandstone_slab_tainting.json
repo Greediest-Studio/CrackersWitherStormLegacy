@@ -1,0 +1,1 @@
+{"block":"minecraft:cut_sandstone_slab","properties_to_copy":["type","waterlogged"],"replacement":{"Name":"witherstormmod:tainted_cut_sandstone_slab","Properties":{"type":"bottom","waterlogged":"false"}}}

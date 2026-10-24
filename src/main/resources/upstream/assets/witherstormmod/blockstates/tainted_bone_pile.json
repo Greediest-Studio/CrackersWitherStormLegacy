@@ -1,0 +1,1 @@
+{"variants":{"facing=east":{"model":"witherstormmod:block/tainted_bone_pile","y":90},"facing=north":{"model":"witherstormmod:block/tainted_bone_pile"},"facing=south":{"model":"witherstormmod:block/tainted_bone_pile","y":180},"facing=west":{"model":"witherstormmod:block/tainted_bone_pile","y":270}}}

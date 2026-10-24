@@ -1,0 +1,1 @@
+{"block":"minecraft:smooth_sandstone_stairs","properties_to_copy":["facing","half","shape","waterlogged"],"replacement":{"Name":"witherstormmod:tainted_smooth_sandstone_stairs","Properties":{"facing":"north","half":"bottom","shape":"straight","waterlogged":"false"}}}

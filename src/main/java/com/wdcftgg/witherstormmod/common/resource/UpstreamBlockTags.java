@@ -90,11 +90,11 @@ public final class UpstreamBlockTags {
     public static synchronized void initialize() {
         Map<String, TagDefinition> loaded = new LinkedHashMap<String, TagDefinition>();
         try {
-            for (String entryName : UpstreamResourceArchive.listEntries("data/", ".json")) {
+            for (String entryName : BundledResources.listEntries("data/", ".json")) {
                 String tagName = tagName(entryName);
                 if (tagName == null || isRemovedBlockTag(tagName)) continue;
                 JsonObject root;
-                try (InputStream stream = UpstreamResourceArchive.open(entryName);
+                try (InputStream stream = BundledResources.open(entryName);
                      InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
                     root = JsonParser.parseReader(reader).getAsJsonObject();
                 }
@@ -118,7 +118,7 @@ public final class UpstreamBlockTags {
                         root.has("replace") && root.get("replace").getAsBoolean(), values));
             }
         } catch (IOException | RuntimeException exception) {
-            throw new IllegalStateException("Unable to load block tags from the external Wither Storm archive",
+            throw new IllegalStateException("Unable to load block tags from the bundled Wither Storm resources",
                     exception);
         }
         requireTag(loaded, WITHER_STORM_BLOCK_BLACKLIST);
@@ -136,7 +136,7 @@ public final class UpstreamBlockTags {
         definitions = Collections.unmodifiableMap(loaded);
         membershipCaches = new ConcurrentHashMap<String, byte[]>();
         initialized = true;
-        WitherStormMod.LOGGER.info("Indexed {} external upstream block tags", loaded.size());
+        WitherStormMod.LOGGER.info("Indexed {} bundled upstream block tags", loaded.size());
     }
 
     public static boolean contains(String tagName, IBlockState state) {

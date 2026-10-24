@@ -102,6 +102,11 @@ processResources {
 }
 
 sourceSets {
+    test {
+        // Unimined 的映射游戏类默认只供 main 使用；资源包测试也需要这些类型。
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.compileClasspath
+    }
     main {
         blossom {
             javaSources {
@@ -226,3 +231,21 @@ tasks.withType(JavaCompile).configureEach {
 
 apply from: 'gradle/scripts/publishing.gradle'
 apply from: 'gradle/scripts/extra.gradle'
+
+// 根据现有内置资源自动生成枚举索引。
+def bundledResourcesDirectory = layout.projectDirectory.dir('src/main/resources/upstream')
+def bundledIndexDirectory = layout.buildDirectory.dir('generated/bundled-resource-index')
+def generateBundledResourceIndex = tasks.register('generateBundledResourceIndex') {
+    inputs.dir(bundledResourcesDirectory)
+    outputs.dir(bundledIndexDirectory)
+    doLast {
+        def root = bundledResourcesDirectory.asFile.toPath()
+        def paths = fileTree(bundledResourcesDirectory).files.collect {
+            root.relativize(it.toPath()).toString().replace('\\', '/')
+        }.sort()
+        def index = new File(bundledIndexDirectory.get().asFile, 'upstream/index.txt')
+        index.parentFile.mkdirs()
+        index.setText(paths.join('\n') + '\n', 'UTF-8')
+    }
+}
+sourceSets.main.resources.srcDir(generateBundledResourceIndex)

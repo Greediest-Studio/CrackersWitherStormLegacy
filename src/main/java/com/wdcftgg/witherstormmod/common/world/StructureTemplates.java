@@ -2,7 +2,7 @@ package com.wdcftgg.witherstormmod.common.world;
 
 import com.google.common.base.Optional;
 import com.wdcftgg.witherstormmod.WitherStormMod;
-import com.wdcftgg.witherstormmod.common.resource.UpstreamResourceArchive;
+import com.wdcftgg.witherstormmod.common.resource.BundledResources;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockButton;
 import net.minecraft.block.BlockLeaves;
@@ -195,7 +195,7 @@ public final class StructureTemplates {
 
     private static TemplateData load(String id) {
         String path = "data/witherstormmod/structures/" + id + ".nbt";
-        try (InputStream stream = UpstreamResourceArchive.open(path)) {
+        try (InputStream stream = BundledResources.open(path)) {
             NBTTagCompound root = CompressedStreamTools.readCompressed(stream);
             List<Connector> connectors = readConnectors(root);
             NBTTagList palette = root.getTagList("palette", 10);

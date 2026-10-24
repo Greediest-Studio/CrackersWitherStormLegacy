@@ -1,0 +1,1 @@
+{"block":"minecraft:jack_o_lantern","potion_effect":"minecraft:wither","properties_to_copy":["facing"],"replacement":{"Name":"witherstormmod:tainted_jack_o_lantern","Properties":{"facing":"north"}}}

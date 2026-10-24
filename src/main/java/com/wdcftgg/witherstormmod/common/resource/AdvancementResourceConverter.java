@@ -57,6 +57,7 @@ public final class AdvancementResourceConverter {
 
     public static final Set<String> REMOVED_MAIN_ADVANCEMENTS = Collections.unmodifiableSet(
             new LinkedHashSet<String>(Arrays.asList(
+                    "main/silver_lining.json",
                     "main/amulet.json",
                     "main/fully_link_amulet.json",
                     "main/activate_super_beacon.json",
@@ -391,7 +392,7 @@ public final class AdvancementResourceConverter {
 
         String entryName = "data/" + namespace + "/tags/items/" + path + ".json";
         JsonObject tag;
-        try (InputStream source = UpstreamResourceArchive.open(entryName);
+        try (InputStream source = BundledResources.open(entryName);
              Reader reader = new InputStreamReader(source, StandardCharsets.UTF_8)) {
             tag = JsonParser.parseReader(reader).getAsJsonObject();
         } catch (RuntimeException exception) {
@@ -520,10 +521,10 @@ public final class AdvancementResourceConverter {
             path = recipeId.substring(separator + 1);
         }
         String entryName = "data/" + namespace + "/recipes/" + path + ".json";
-        for (String candidate : UpstreamResourceArchive.listEntries(
+        for (String candidate : BundledResources.listEntries(
                 "data/" + namespace + "/recipes/", ".json")) {
             if (!candidate.equals(entryName)) continue;
-            try (InputStream source = UpstreamResourceArchive.open(candidate)) {
+            try (InputStream source = BundledResources.open(candidate)) {
                 return RecipeResourceConverter.convert(candidate, source) != null;
             }
         }

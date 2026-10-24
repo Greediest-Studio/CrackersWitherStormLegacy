@@ -1,0 +1,1 @@
+{"block":"#minecraft:wooden_doors","properties_to_copy":["facing","half","hinge","open","powered"],"replacement":{"Name":"witherstormmod:tainted_door","Properties":{"facing":"north","half":"lower","hinge":"left","open":"false","powered":"false"}}}

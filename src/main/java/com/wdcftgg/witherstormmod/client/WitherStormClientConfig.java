@@ -53,10 +53,6 @@ public final class WitherStormClientConfig {
     @Config.Comment("是否渲染凋零风暴头部的发光眼睛与牙齿贴图。")
     public static boolean renderEmissiveDecalForHeads = true;
 
-    @Config.Name("patronCosmetic")
-    @Config.Comment("是否显示赞助者彩蛋外观（nonamecrackers2 命名的共生体）。")
-    public static boolean patronCosmetic = true;
-
     @Config.Name("optifineWarning")
     @Config.Comment("进入世界时是否提示 OptiFine 兼容性警告。")
     public static boolean optifineWarning = true;

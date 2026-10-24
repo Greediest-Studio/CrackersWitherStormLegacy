@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","category":"misc","key":{"1":{"item":"witherstormmod:tainted_dust"},"~":{"item":"minecraft:stick"}},"pattern":["1","~"],"result":{"item":"witherstormmod:tainted_torch"},"show_notification":true}

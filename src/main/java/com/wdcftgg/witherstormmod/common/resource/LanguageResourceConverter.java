@@ -19,6 +19,7 @@ final class LanguageResourceConverter {
     private static final String PREFIX = "assets/witherstormmod/lang/";
     private static final Set<String> REMOVED_ADVANCEMENTS = Collections.unmodifiableSet(
             new HashSet<String>(Arrays.asList(
+                    "silver_lining",
                     "amulet",
                     "fully_link_amulet",
                     "activate_super_beacon",
@@ -33,6 +34,7 @@ final class LanguageResourceConverter {
                     "autoSpawnWitherStorm",
                     "crossbowsSupportEnderPearls",
                     "customPanorama",
+                    "patronCosmetic",
                     "generateSpawnPlatform",
                     "allowSuperBeaconResummoning",
                     "autoSpawnTime",

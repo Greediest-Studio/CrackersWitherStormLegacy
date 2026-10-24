@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.wdcftgg.witherstormmod.Tags;
 import com.wdcftgg.witherstormmod.WitherStormMod;
 import com.wdcftgg.witherstormmod.common.resource.LootTableResourceConverter;
-import com.wdcftgg.witherstormmod.common.resource.UpstreamResourceArchive;
+import com.wdcftgg.witherstormmod.common.resource.BundledResources;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootEntry;
@@ -50,29 +50,29 @@ public final class ExternalLootTables {
         if (!convertedTables.isEmpty()) return;
         Map<ResourceLocation, String> loaded = new LinkedHashMap<ResourceLocation, String>();
         try {
-            for (String entryName : UpstreamResourceArchive.listEntries(
+            for (String entryName : BundledResources.listEntries(
                     LootTableResourceConverter.LOOT_TABLE_PREFIX, ".json")) {
                 String relative = entryName.substring(LootTableResourceConverter.LOOT_TABLE_PREFIX.length(),
                         entryName.length() - ".json".length());
                 if (!relative.startsWith("entities/") && !relative.startsWith("chests/")) continue;
                 JsonObject converted;
-                try (InputStream stream = UpstreamResourceArchive.open(entryName)) {
+                try (InputStream stream = BundledResources.open(entryName)) {
                     converted = LootTableResourceConverter.convert(entryName, stream);
                 }
                 ResourceLocation name = new ResourceLocation(Tags.MOD_ID, relative);
                 if (loaded.put(name, LootTableResourceConverter.serialize(converted)) != null) {
-                    throw new IllegalStateException("Duplicate external loot table " + name);
+                    throw new IllegalStateException("Duplicate bundled loot table " + name);
                 }
             }
         } catch (Exception exception) {
-            throw new IllegalStateException("Unable to load loot tables from the external Wither Storm archive", exception);
+            throw new IllegalStateException("Unable to load loot tables from the bundled Wither Storm resources", exception);
         }
         if (loaded.size() != EXPECTED_LOOT_TABLE_COUNT) {
             throw new IllegalStateException("Expected " + EXPECTED_LOOT_TABLE_COUNT
-                    + " external loot tables but loaded " + loaded.size());
+                    + " bundled loot tables but loaded " + loaded.size());
         }
         convertedTables = Collections.unmodifiableMap(loaded);
-        WitherStormMod.LOGGER.info("Prepared {} loot tables from the external Wither Storm archive", loaded.size());
+        WitherStormMod.LOGGER.info("Prepared {} loot tables from the bundled Wither Storm resources", loaded.size());
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

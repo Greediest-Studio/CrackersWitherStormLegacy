@@ -22,7 +22,7 @@ import com.wdcftgg.witherstormmod.common.loot.ExternalLootTables;
 import com.wdcftgg.witherstormmod.common.network.ModNetwork;
 import com.wdcftgg.witherstormmod.common.proxy.CommonProxy;
 import com.wdcftgg.witherstormmod.common.gui.ModGuiHandler;
-import com.wdcftgg.witherstormmod.common.resource.UpstreamResourceArchive;
+import com.wdcftgg.witherstormmod.common.resource.BundledResources;
 import com.wdcftgg.witherstormmod.common.resource.UpstreamBlockTags;
 import com.wdcftgg.witherstormmod.common.resource.UpstreamEntityTags;
 import com.wdcftgg.witherstormmod.common.resource.UpstreamItemTags;
@@ -47,7 +47,6 @@ import java.time.LocalDate;
 public class WitherStormMod {
 
     public static final Logger LOGGER = LogManager.getLogger(Tags.MOD_NAME);
-    public static final String UPSTREAM_RESOURCEPACK_NAME = "witherstormmod-1.20.1-4.2.1-all.jar";
 
     @Mod.Instance(Tags.MOD_ID)
     public static WitherStormMod INSTANCE;
@@ -67,9 +66,9 @@ public class WitherStormMod {
     public void preInit(FMLPreInitializationEvent event) {
         WitherStormSelectorHandler.register();
         try {
-            UpstreamResourceArchive.initialize(event.getModConfigurationDirectory().getParentFile());
+            BundledResources.initialize();
         } catch (java.io.IOException exception) {
-            throw new IllegalStateException("Unable to initialize the external Wither Storm resource pack", exception);
+            throw new IllegalStateException("Unable to initialize the bundled Wither Storm resources", exception);
         }
         UpstreamBlockTags.initialize();
         UpstreamEntityTags.initialize();
@@ -95,7 +94,7 @@ public class WitherStormMod {
         ModPaintings.register();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new ModGuiHandler());
         proxy.preInit(event);
-        LOGGER.info("Loaded {} as a 1.12.2 port using upstream resources from {}", Tags.MOD_NAME, UPSTREAM_RESOURCEPACK_NAME);
+        LOGGER.info("Loaded {} with bundled upstream resources", Tags.MOD_NAME);
     }
 
     @Mod.EventHandler
@@ -111,7 +110,7 @@ public class WitherStormMod {
             ExternalAdvancements.install(event.getServer());
         } catch (java.io.IOException exception) {
             throw new IllegalStateException(
-                    "Unable to prepare advancements from the external Wither Storm resource pack", exception);
+                    "Unable to prepare advancements from the bundled Wither Storm resources", exception);
         }
     }
 

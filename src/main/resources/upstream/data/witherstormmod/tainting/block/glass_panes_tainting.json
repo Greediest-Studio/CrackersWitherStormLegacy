@@ -1,0 +1,1 @@
+{"block":"#forge:glass_panes","properties_to_copy":["east","north","south","waterlogged","west"],"replacement":{"Name":"witherstormmod:tainted_glass_pane","Properties":{"east":"false","north":"false","south":"false","waterlogged":"false","west":"false"}}}

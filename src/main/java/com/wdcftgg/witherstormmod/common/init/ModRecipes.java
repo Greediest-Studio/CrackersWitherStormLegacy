@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.wdcftgg.witherstormmod.Tags;
 import com.wdcftgg.witherstormmod.WitherStormMod;
 import com.wdcftgg.witherstormmod.common.resource.RecipeResourceConverter;
-import com.wdcftgg.witherstormmod.common.resource.UpstreamResourceArchive;
+import com.wdcftgg.witherstormmod.common.resource.BundledResources;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
@@ -37,12 +37,12 @@ public final class ModRecipes {
     public static void registerStonecutting() {
         int registered = 0;
         try {
-            List<String> entries = UpstreamResourceArchive.listEntries(
+            List<String> entries = BundledResources.listEntries(
                     RecipeResourceConverter.RECIPE_PREFIX, ".json");
             JsonContext context = new JsonContext(Tags.MOD_ID);
             for (String entryName : entries) {
                 JsonObject converted;
-                try (InputStream stream = UpstreamResourceArchive.open(entryName)) {
+                try (InputStream stream = BundledResources.open(entryName)) {
                     converted = RecipeResourceConverter.convertStonecutting(entryName, stream);
                 }
                 if (converted == null) continue;
@@ -54,14 +54,14 @@ public final class ModRecipes {
             }
         } catch (Exception exception) {
             throw new IllegalStateException(
-                    "Unable to register stonecutting recipes from the external Wither Storm archive", exception);
+                    "Unable to register stonecutting recipes from the bundled Wither Storm resources", exception);
         }
         if (registered != EXPECTED_STONECUTTING_RECIPE_COUNT) {
             throw new IllegalStateException("Expected " + EXPECTED_STONECUTTING_RECIPE_COUNT
-                    + " external stonecutting recipes but registered " + registered);
+                    + " bundled stonecutting recipes but registered " + registered);
         }
         WitherStormMod.LOGGER.info(
-                "Registered {} stonecutting recipes from the external Wither Storm archive through Future MC",
+                "Registered {} stonecutting recipes from the bundled Wither Storm resources through Future MC",
                 registered);
     }
 
@@ -69,12 +69,12 @@ public final class ModRecipes {
     public static void registerCraftingRecipes(RegistryEvent.Register<IRecipe> event) {
         int registered = 0;
         try {
-            List<String> entries = UpstreamResourceArchive.listEntries(
+            List<String> entries = BundledResources.listEntries(
                     RecipeResourceConverter.RECIPE_PREFIX, ".json");
             JsonContext context = new JsonContext(Tags.MOD_ID);
             for (String entryName : entries) {
                 JsonObject converted;
-                try (InputStream stream = UpstreamResourceArchive.open(entryName)) {
+                try (InputStream stream = BundledResources.open(entryName)) {
                     converted = RecipeResourceConverter.convert(entryName, stream);
                 }
                 if (converted == null) continue;
@@ -87,11 +87,11 @@ public final class ModRecipes {
                 registered++;
             }
         } catch (Exception exception) {
-            throw new IllegalStateException("Unable to register recipes from the external Wither Storm archive", exception);
+            throw new IllegalStateException("Unable to register recipes from the bundled Wither Storm resources", exception);
         }
         if (registered <= 0) {
-            throw new IllegalStateException("No crafting recipes were registered from the external Wither Storm archive");
+            throw new IllegalStateException("No crafting recipes were registered from the bundled Wither Storm resources");
         }
-        WitherStormMod.LOGGER.info("Registered {} crafting recipes from the external Wither Storm archive", registered);
+        WitherStormMod.LOGGER.info("Registered {} crafting recipes from the bundled Wither Storm resources", registered);
     }
 }

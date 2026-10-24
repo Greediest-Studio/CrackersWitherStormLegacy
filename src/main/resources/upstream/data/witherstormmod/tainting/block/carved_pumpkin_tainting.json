@@ -1,0 +1,1 @@
+{"block":"minecraft:carved_pumpkin","potion_effect":"minecraft:wither","properties_to_copy":["facing"],"replacement":{"Name":"witherstormmod:tainted_carved_pumpkin","Properties":{"facing":"north"}}}

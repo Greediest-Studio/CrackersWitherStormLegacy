@@ -119,7 +119,7 @@ public final class PostProcessingShaders implements IResourceManagerReloadListen
                     minecraft.getFramebuffer(), ABERRATION);
             resizeIfNeeded();
         } catch (JsonSyntaxException | IOException exception) {
-            WitherStormMod.LOGGER.warn("Failed to load external Formidibomb shader {}", ABERRATION,
+            WitherStormMod.LOGGER.warn("Failed to load bundled Formidibomb shader {}", ABERRATION,
                     exception);
             deleteEffect();
         }

@@ -1,0 +1,1 @@
+{"block":"minecraft:stone_stairs","properties_to_copy":["facing","half","shape","waterlogged"],"replacement":{"Name":"witherstormmod:tainted_stone_stairs","Properties":{"facing":"north","half":"bottom","shape":"straight","waterlogged":"false"}}}

@@ -8,7 +8,7 @@ import com.wdcftgg.witherstormmod.common.entity.SickenedEntities;
 import com.wdcftgg.witherstormmod.common.entity.SickenedMobEntity;
 import com.wdcftgg.witherstormmod.common.init.ModBlocks;
 import com.wdcftgg.witherstormmod.common.resource.UpstreamBlockTags;
-import com.wdcftgg.witherstormmod.common.resource.UpstreamResourceArchive;
+import com.wdcftgg.witherstormmod.common.resource.BundledResources;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.properties.IProperty;
@@ -118,21 +118,21 @@ public final class TaintingData {
             }
         } catch (Exception exception) {
             throw new IllegalStateException(
-                    "Unable to load tainting recipes from the external Wither Storm archive", exception);
+                    "Unable to load tainting recipes from the bundled Wither Storm resources", exception);
         }
         if (loadedBlocks.size() != EXPECTED_BLOCK_RECIPES) {
             throw new IllegalStateException("Expected " + EXPECTED_BLOCK_RECIPES
-                    + " external block tainting recipes but loaded " + loadedBlocks.size());
+                    + " bundled block tainting recipes but loaded " + loadedBlocks.size());
         }
         if (loadedMobs.size() != EXPECTED_MOB_CONVERSIONS) {
             throw new IllegalStateException("Expected " + EXPECTED_MOB_CONVERSIONS
-                    + " external mob conversions but loaded " + loadedMobs.size());
+                    + " bundled mob conversions but loaded " + loadedMobs.size());
         }
         blockRecipes = Collections.unmodifiableList(loadedBlocks);
         mobRecipes = Collections.unmodifiableList(loadedMobs);
         originalTypes = Collections.unmodifiableMap(loadedOriginals);
         WitherStormMod.LOGGER.info("Loaded {} block tainting recipes and {} mob conversions "
-                + "from the external Wither Storm archive", loadedBlocks.size(), loadedMobs.size());
+                + "from the bundled Wither Storm resources", loadedBlocks.size(), loadedMobs.size());
     }
 
     static BlockRecipe findBlockRecipe(IBlockState state) {
@@ -425,13 +425,13 @@ public final class TaintingData {
 
     private static List<String> sortedEntries(String prefix) throws IOException {
         List<String> entries = new ArrayList<String>(
-                UpstreamResourceArchive.listEntries(prefix, ".json"));
+                BundledResources.listEntries(prefix, ".json"));
         Collections.sort(entries);
         return entries;
     }
 
     private static JsonObject readJson(String entryName) throws IOException {
-        try (InputStream stream = UpstreamResourceArchive.open(entryName);
+        try (InputStream stream = BundledResources.open(entryName);
              InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             return JsonParser.parseReader(reader).getAsJsonObject();
         } catch (RuntimeException exception) {

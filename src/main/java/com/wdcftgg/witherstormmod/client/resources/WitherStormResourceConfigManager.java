@@ -7,7 +7,7 @@ import com.wdcftgg.witherstormmod.WitherStormMod;
 import com.wdcftgg.witherstormmod.client.resources.color.ColorSet;
 import com.wdcftgg.witherstormmod.client.resources.color.SkyColorSet;
 import com.wdcftgg.witherstormmod.client.resources.texture.TextureSet;
-import com.wdcftgg.witherstormmod.common.resource.UpstreamResourceArchive;
+import com.wdcftgg.witherstormmod.common.resource.BundledResources;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.Color;
@@ -46,7 +46,7 @@ public final class WitherStormResourceConfigManager {
     }
 
     private void loadColors() {
-        try (InputStream stream = UpstreamResourceArchive.open(
+        try (InputStream stream = BundledResources.open(
                 "assets/witherstormmod/config/colors.json")) {
             JsonObject root = JsonParser.parseReader(
                     new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
@@ -65,14 +65,14 @@ public final class WitherStormResourceConfigManager {
                 if (phase < 0 || phase > 7) continue;
                 colors.put(phase, parseColorSet(entry.getValue().getAsJsonObject()));
             }
-            WitherStormMod.LOGGER.info("Loaded external Wither Storm color sets");
+            WitherStormMod.LOGGER.info("Loaded bundled Wither Storm color sets");
         } catch (Exception exception) {
 
         }
     }
 
     private void loadTextures() {
-        try (InputStream stream = UpstreamResourceArchive.open(
+        try (InputStream stream = BundledResources.open(
                 "assets/witherstormmod/config/textures.json")) {
             JsonObject root = JsonParser.parseReader(
                     new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
@@ -88,7 +88,7 @@ public final class WitherStormResourceConfigManager {
                 if (phase < 0 || phase > 7) continue;
                 textures.put(phase, parseTextureSet(entry.getValue().getAsJsonObject()));
             }
-            WitherStormMod.LOGGER.info("Loaded external Wither Storm texture sets");
+            WitherStormMod.LOGGER.info("Loaded bundled Wither Storm texture sets");
         } catch (Exception exception) {
 
         }

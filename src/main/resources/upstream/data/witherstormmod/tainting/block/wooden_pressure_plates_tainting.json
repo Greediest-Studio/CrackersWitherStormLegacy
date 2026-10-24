@@ -1,0 +1,1 @@
+{"block":"#minecraft:wooden_pressure_plates","properties_to_copy":["powered"],"replacement":{"Name":"witherstormmod:tainted_pressure_plate","Properties":{"powered":"false"}}}

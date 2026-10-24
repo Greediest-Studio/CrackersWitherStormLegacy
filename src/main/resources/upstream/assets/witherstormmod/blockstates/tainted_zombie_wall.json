@@ -1,0 +1,1 @@
+{"variants":{"facing=east":{"model":"witherstormmod:block/tainted_zombie_wall","y":90},"facing=north":{"model":"witherstormmod:block/tainted_zombie_wall"},"facing=south":{"model":"witherstormmod:block/tainted_zombie_wall","y":180},"facing=west":{"model":"witherstormmod:block/tainted_zombie_wall","y":270}}}

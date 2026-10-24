@@ -48,11 +48,11 @@ public final class UpstreamItemTags {
     public static synchronized void initialize() {
         Map<String, TagDefinition> loaded = new LinkedHashMap<String, TagDefinition>();
         try {
-            for (String entryName : UpstreamResourceArchive.listEntries("data/", ".json")) {
+            for (String entryName : BundledResources.listEntries("data/", ".json")) {
                 String tagName = tagName(entryName);
                 if (tagName == null) continue;
                 JsonObject root;
-                try (InputStream stream = UpstreamResourceArchive.open(entryName);
+                try (InputStream stream = BundledResources.open(entryName);
                      InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
                     root = JsonParser.parseReader(reader).getAsJsonObject();
                 }
@@ -71,7 +71,7 @@ public final class UpstreamItemTags {
                         root.has("replace") && root.get("replace").getAsBoolean(), values));
             }
         } catch (IOException | RuntimeException exception) {
-            throw new IllegalStateException("Unable to load item tags from the external Wither Storm archive",
+            throw new IllegalStateException("Unable to load item tags from the bundled Wither Storm resources",
                     exception);
         }
         requireTag(loaded, JUNK);
@@ -83,7 +83,7 @@ public final class UpstreamItemTags {
         requireTag(loaded, TAINTED_LOGS);
         definitions = Collections.unmodifiableMap(loaded);
         initialized = true;
-        WitherStormMod.LOGGER.info("Indexed {} external upstream item tags", loaded.size());
+        WitherStormMod.LOGGER.info("Indexed {} bundled upstream item tags", loaded.size());
     }
 
     public static boolean contains(String tagName, ItemStack stack) {

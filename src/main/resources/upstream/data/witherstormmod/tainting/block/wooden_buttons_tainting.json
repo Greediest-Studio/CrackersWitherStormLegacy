@@ -1,0 +1,1 @@
+{"block":"#minecraft:wooden_buttons","properties_to_copy":["face","facing","powered"],"replacement":{"Name":"witherstormmod:tainted_button","Properties":{"face":"wall","facing":"north","powered":"false"}}}

@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","category":"building","key":{"#":{"item":"witherstormmod:tainted_flesh_block"},"A":{"item":"witherstormmod:tainted_dust"}},"pattern":["###","#A#","###"],"result":{"item":"witherstormmod:infected_flesh_block"},"show_notification":true}

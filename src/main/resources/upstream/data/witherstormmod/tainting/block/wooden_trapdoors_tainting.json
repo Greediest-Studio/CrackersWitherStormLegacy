@@ -1,0 +1,1 @@
+{"block":"#minecraft:wooden_trapdoors","properties_to_copy":["facing","half","open","powered","waterlogged"],"replacement":{"Name":"witherstormmod:tainted_trapdoor","Properties":{"facing":"north","half":"bottom","open":"false","powered":"false","waterlogged":"false"}}}

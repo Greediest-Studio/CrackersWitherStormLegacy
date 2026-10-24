@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","category":"building","key":{"#":{"item":"witherstormmod:tainted_sandstone"}},"pattern":["#  ","## ","###"],"result":{"count":4,"item":"witherstormmod:tainted_sandstone_stairs"},"show_notification":true}

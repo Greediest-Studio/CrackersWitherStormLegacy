@@ -26,7 +26,7 @@ import com.wdcftgg.witherstormmod.common.capability.WitherSicknessCapability;
 import com.wdcftgg.witherstormmod.common.capability.WitherSicknessTracker;
 import com.wdcftgg.witherstormmod.common.init.ModBlocks;
 import com.wdcftgg.witherstormmod.common.init.ModSounds;
-import com.wdcftgg.witherstormmod.common.resource.UpstreamResourcePackInstaller;
+import com.wdcftgg.witherstormmod.common.resource.BundledResourcePackInstaller;
 import com.wdcftgg.witherstormmod.client.resources.WitherStormResourceConfigManager;
 import com.wdcftgg.witherstormmod.client.shader.PostProcessingShaders;
 import com.wdcftgg.witherstormmod.common.tile.TaintedSignTileEntity;
@@ -70,7 +70,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void preInit(FMLPreInitializationEvent event) {
-        UpstreamResourcePackInstaller.install();
+        BundledResourcePackInstaller.install();
         PostProcessingShaders.INSTANCE.initialize();
         WitherStormResourceConfigManager.initialize();
         LegacyRenderBufferer.INSTANCE.initialize();

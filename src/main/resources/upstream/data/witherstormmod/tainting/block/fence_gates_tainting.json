@@ -1,0 +1,1 @@
+{"block":"#minecraft:fence_gates","properties_to_copy":["facing","in_wall","open","powered"],"replacement":{"Name":"witherstormmod:tainted_fence_gate","Properties":{"facing":"north","in_wall":"false","open":"false","powered":"false"}}}
