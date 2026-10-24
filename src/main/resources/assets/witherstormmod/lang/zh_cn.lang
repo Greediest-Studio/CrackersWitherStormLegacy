@@ -132,7 +132,6 @@ item.tainted_sign.name=污浊木告示牌
 item.tainted_torch.name=污浊火把
 
 witherstormmod.resourcepacks.programmer_art=CWSM 程序员美术
-witherstormmod.subtitle.cave_wind=洞穴风声呼啸
 witherstormmod.subtitle.command_block_cracks=命令方块：裂开
 witherstormmod.subtitle.command_block_destruct=命令方块：毁坏
 witherstormmod.subtitle.flaming_skull_impact=烈焰凋灵之首：爆炸

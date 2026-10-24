@@ -40,8 +40,8 @@ public final class ModRegistryNames {
     };
 
     private static final String[] SOUNDS = {
-            "block_cluster_shake", "bowels_loop",
-            "bowels_loud_hurt", "bowels_mood", "bowels_transport", "bowels_tremble", "cave_wind",
+            "block_cluster_shake",
+            "bowels_loud_hurt", "bowels_mood", "bowels_transport", "bowels_tremble",
             "command_block_activates", "command_block_build", "command_block_cracks", "command_block_damage",
             "command_block_death", "command_block_destruct", "command_block_hit", "command_block_power_down",
             "command_block_pulse_loop", "command_block_summon", "earth_rumble", "flaming_skull_impact",

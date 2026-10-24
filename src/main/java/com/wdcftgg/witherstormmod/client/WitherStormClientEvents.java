@@ -8,7 +8,6 @@ import com.wdcftgg.witherstormmod.common.init.ModItems;
 import com.wdcftgg.witherstormmod.common.init.ModEffects;
 import com.wdcftgg.witherstormmod.client.sound.WitherStormLoopSound;
 import com.wdcftgg.witherstormmod.client.sound.WitherStormTrembleSound;
-import com.wdcftgg.witherstormmod.client.sound.BowelsLoopSound;
 import com.wdcftgg.witherstormmod.client.sound.CommandBlockLoopSound;
 import com.wdcftgg.witherstormmod.client.sound.FormidibombFuseSound;
 import com.wdcftgg.witherstormmod.client.sound.TractorBeamLoopSound;
@@ -124,7 +123,6 @@ public final class WitherStormClientEvents {
     private static final Map<SickenedEntities.WitheredSymbiontEntity, WitheredSymbiontHeartbeatSound>
             SYMBIONT_HEARTBEAT_LOOPS =
             new IdentityHashMap<SickenedEntities.WitheredSymbiontEntity, WitheredSymbiontHeartbeatSound>();
-    private static BowelsLoopSound bowelsLoop;
     private static int bowelsMoodDelay;
     private static int bowelsTrembleTimer = -1;
     private static int bowelsScreamTimer = -1;
@@ -230,7 +228,6 @@ public final class WitherStormClientEvents {
             WITHER_STORM_LOOP_DISABLED.clear();
             witherStormLoopTick = 0;
             witherStormLoopWorld = null;
-            if (bowelsLoop != null) bowelsLoop.stop();
             for (WitherStormTrembleSound trembleLoop : TREMBLE_LOOPS.values()) {
                 trembleLoop.stopImmediately();
             }
@@ -255,7 +252,6 @@ public final class WitherStormClientEvents {
                 loop.stopImmediately();
             }
             SYMBIONT_HEARTBEAT_LOOPS.clear();
-            bowelsLoop = null;
             bowelsMoodDelay = 0;
             PostProcessingShaders.INSTANCE.setSource(null);
             return;
@@ -325,8 +321,6 @@ public final class WitherStormClientEvents {
             loop.stopImmediately();
         }
         SYMBIONT_HEARTBEAT_LOOPS.clear();
-        if (bowelsLoop != null) bowelsLoop.stop();
-        bowelsLoop = null;
     }
 
     private static void updateSymbiontSpellLoops(Minecraft minecraft) {
@@ -1204,19 +1198,10 @@ public final class WitherStormClientEvents {
 
     private static void updateBowelsAmbience(Minecraft minecraft) {
         if (minecraft.player.dimension != BowelsDimensions.DIMENSION_ID) {
-            if (bowelsLoop != null) bowelsLoop.stop();
-            bowelsLoop = null;
             bowelsMoodDelay = 0;
             bowelsTrembleTimer = -1;
             bowelsScreamTimer = -1;
             return;
-        }
-        if (bowelsLoop == null || bowelsLoop.isDonePlaying()) {
-            SoundEvent loopSound = ModSounds.get("bowels_loop");
-            if (loopSound != null) {
-                bowelsLoop = new BowelsLoopSound(loopSound);
-                minecraft.getSoundHandler().playSound(bowelsLoop);
-            }
         }
         if (--bowelsMoodDelay <= 0) {
             bowelsMoodDelay = 240 + minecraft.world.rand.nextInt(240);
