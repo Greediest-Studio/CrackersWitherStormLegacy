@@ -5,18 +5,6 @@ import net.minecraftforge.common.config.Config;
 
 @Config(modid = Tags.MOD_ID, name = Tags.MOD_ID + "/client")
 public final class WitherStormClientConfig {
-    @Config.Name("playWitherStormTheme")
-    @Config.Comment("是否播放凋零风暴和肠道命令方块的 Boss 主题音乐。")
-    public static boolean playWitherStormTheme = false;
-
-    @Config.Name("playSymbiontTheme")
-    @Config.Comment("是否播放凋零共生体的 Boss 主题音乐。")
-    public static boolean playSymbiontTheme = true;
-
-    @Config.Name("playMinecraftMusic")
-    @Config.Comment("是否允许原版 Minecraft 音乐播放。")
-    public static boolean playMinecraftMusic = true;
-
     @Config.Name("blockClusterRendering")
     @Config.Comment("是否渲染方块质量簇；强制渲染的剧情质量簇不受此选项影响。")
     public static boolean blockClusterRendering = true;

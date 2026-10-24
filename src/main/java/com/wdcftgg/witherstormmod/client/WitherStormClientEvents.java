@@ -9,7 +9,6 @@ import com.wdcftgg.witherstormmod.common.init.ModEffects;
 import com.wdcftgg.witherstormmod.client.sound.WitherStormLoopSound;
 import com.wdcftgg.witherstormmod.client.sound.WitherStormTrembleSound;
 import com.wdcftgg.witherstormmod.client.sound.BowelsLoopSound;
-import com.wdcftgg.witherstormmod.client.sound.BossThemeManager;
 import com.wdcftgg.witherstormmod.client.sound.CommandBlockLoopSound;
 import com.wdcftgg.witherstormmod.client.sound.FormidibombFuseSound;
 import com.wdcftgg.witherstormmod.client.sound.TractorBeamLoopSound;
@@ -31,7 +30,6 @@ import com.wdcftgg.witherstormmod.common.entity.SupplementalEntities;
 import com.wdcftgg.witherstormmod.common.entity.SymbiontDragonFireballEntity;
 import com.wdcftgg.witherstormmod.common.entity.FormidibombSource;
 import com.wdcftgg.witherstormmod.common.entity.SickenedEntities;
-import com.wdcftgg.witherstormmod.common.entity.BossThemeProvider;
 import com.wdcftgg.witherstormmod.common.entity.TractorBeamProvider;
 import com.wdcftgg.witherstormmod.common.config.WitherStormConfig;
 import com.wdcftgg.witherstormmod.common.capability.WitherSicknessCapability;
@@ -47,7 +45,6 @@ import net.minecraft.client.audio.MovingSound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -218,7 +215,6 @@ public final class WitherStormClientEvents {
             return;
         }
         if (event.phase != TickEvent.Phase.END) return;
-        BossThemeManager.INSTANCE.tick(minecraft);
         TractorBeamOverlay.tick(minecraft);
         if (!creativeStackModelsAudited) {
             auditCreativeStackModels(minecraft);
@@ -1093,22 +1089,6 @@ public final class WitherStormClientEvents {
     public static void renderTractorBeamOverlay(RenderGameOverlayEvent.Post event) {
         if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
         TractorBeamOverlay.render(Minecraft.getMinecraft(), event.getResolution());
-    }
-
-    @SubscribeEvent
-    public static void renderSymbiontThemeWatermark(RenderGameOverlayEvent.Post event) {
-        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
-        Minecraft minecraft = Minecraft.getMinecraft();
-        BossThemeProvider provider = BossThemeManager.INSTANCE.getActiveProvider();
-        if (!(provider instanceof SickenedEntities.WitheredSymbiontEntity)) return;
-        String watermark = I18n.format("witherstormmod.watermark.withered_symbiont_theme");
-        if (watermark.isEmpty()) return;
-        ScaledResolution resolution = event.getResolution();
-        GlStateManager.enableBlend();
-        minecraft.fontRenderer.drawStringWithShadow(watermark,
-                resolution.getScaledWidth() - minecraft.fontRenderer.getStringWidth(watermark) - 4,
-                resolution.getScaledHeight() - 12, 0x66FFFFFF);
-        GlStateManager.disableBlend();
     }
 
     @SubscribeEvent

@@ -15,7 +15,6 @@ import com.wdcftgg.witherstormmod.client.render.TaintedSignRenderer;
 import com.wdcftgg.witherstormmod.client.render.WitheredPhlegmRenderer;
 import com.wdcftgg.witherstormmod.client.particle.PhlegmBlockParticle;
 import com.wdcftgg.witherstormmod.client.particle.CommandBlockParticle;
-import com.wdcftgg.witherstormmod.client.sound.BossThemeManager;
 import com.wdcftgg.witherstormmod.client.gui.WitheredPhlegmScreen;
 import com.wdcftgg.witherstormmod.common.inventory.WitheredPhlegmContainer;
 import com.wdcftgg.witherstormmod.client.render.SickenedRendererRegistry;
@@ -150,7 +149,6 @@ public class ClientProxy extends CommonProxy {
         Minecraft.getMinecraft().addScheduledTask(
                 () -> {
                     ClientEffects.spawnFormidibombExplosion(x, y, z);
-                    BossThemeManager.INSTANCE.forceStop();
                     World world = Minecraft.getMinecraft().world;
                     if (world == null) return;
                     SoundEvent explosion = ModSounds.get(WitherStormClientConfig.earRingingEffects
@@ -199,12 +197,6 @@ public class ClientProxy extends CommonProxy {
     @Override
     public Object createWitheredPhlegmGui(EntityPlayer player, WitheredPhlegmTileEntity tile) {
         return new WitheredPhlegmScreen(new WitheredPhlegmContainer(player.inventory, tile), tile);
-    }
-
-    @Override
-    public void handleBossThemeAccess(int entityId, boolean allowed) {
-        Minecraft.getMinecraft().addScheduledTask(
-                () -> BossThemeManager.INSTANCE.setStormAccess(entityId, allowed));
     }
 
     @Override

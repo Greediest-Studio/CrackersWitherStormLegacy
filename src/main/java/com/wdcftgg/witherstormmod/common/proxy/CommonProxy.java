@@ -53,9 +53,6 @@ public class CommonProxy {
         return null;
     }
 
-    public void handleBossThemeAccess(int entityId, boolean allowed) {
-    }
-
     public void handleCreateDebris(int entityId, boolean hidden) {
     }
 

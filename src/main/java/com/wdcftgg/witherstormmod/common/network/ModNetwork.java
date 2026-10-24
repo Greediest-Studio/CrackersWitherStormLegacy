@@ -54,8 +54,6 @@ public final class ModNetwork {
                 discriminator++, Side.CLIENT);
         CHANNEL.registerMessage(InjureWitherStormHeadMessage.Handler.class, InjureWitherStormHeadMessage.class,
                 discriminator++, Side.SERVER);
-        CHANNEL.registerMessage(BossThemeAccessMessage.Handler.class, BossThemeAccessMessage.class,
-                discriminator++, Side.CLIENT);
         CHANNEL.registerMessage(WitherSicknessMessage.Handler.class, WitherSicknessMessage.class,
                 discriminator++, Side.CLIENT);
         CHANNEL.registerMessage(CommandBlockParticlesMessage.Handler.class, CommandBlockParticlesMessage.class,
@@ -222,11 +220,6 @@ public final class ModNetwork {
     public static void attackPlayingDeadCore(SupplementalEntities.CommandBlockEntity core) {
         if (core == null || !core.world.isRemote) return;
         CHANNEL.sendToServer(new AttackPlayingDeadCoreMessage(core.getEntityId()));
-    }
-
-    public static void sendBossThemeAccess(EntityPlayerMP player, WitherStormEntity storm, boolean allowed) {
-        if (player == null || storm == null || storm.world.isRemote) return;
-        CHANNEL.sendTo(new BossThemeAccessMessage(storm.getEntityId(), allowed), player);
     }
 
     public static void createDebris(EntityPlayerMP player, WitherStormEntity storm, boolean hidden) {
@@ -825,47 +818,6 @@ public final class ModNetwork {
             public IMessage onMessage(WitherStormRotationMessage message, MessageContext context) {
                 WitherStormMod.proxy.handleWitherStormRotation(message.entityId,
                         message.xRotation, message.yRotation);
-                return null;
-            }
-        }
-    }
-
-    public static final class BossThemeAccessMessage implements IMessage {
-        private int entityId;
-        private boolean allowed;
-
-        public BossThemeAccessMessage() {
-        }
-
-        public BossThemeAccessMessage(int entityId, boolean allowed) {
-            this.entityId = entityId;
-            this.allowed = allowed;
-        }
-
-        public int getEntityId() {
-            return entityId;
-        }
-
-        public boolean isAllowed() {
-            return allowed;
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buffer) {
-            entityId = buffer.readInt();
-            allowed = buffer.readBoolean();
-        }
-
-        @Override
-        public void toBytes(ByteBuf buffer) {
-            buffer.writeInt(entityId);
-            buffer.writeBoolean(allowed);
-        }
-
-        public static final class Handler implements IMessageHandler<BossThemeAccessMessage, IMessage> {
-            @Override
-            public IMessage onMessage(BossThemeAccessMessage message, MessageContext context) {
-                WitherStormMod.proxy.handleBossThemeAccess(message.entityId, message.allowed);
                 return null;
             }
         }

@@ -48,19 +48,17 @@ public final class ModRegistryNames {
             "formidibomb_explosion", "formidibomb_explosion_quiet", "formidibomb_pulse_loop",
             "loud_tremble", "mob_cured", "mob_infected",
             "rib_bone_crack", "super_tnt_fuse", "tentacle_spike_stab", "tremble", "whoosh",
-            "wither_storm_ambient", "wither_storm_bite", "wither_storm_boss_theme",
-            "wither_storm_bowels_exposed_theme", "wither_storm_close_loop", "wither_storm_death",
+            "wither_storm_ambient", "wither_storm_bite", "wither_storm_close_loop", "wither_storm_death",
             "wither_storm_distant_loop", "wither_storm_evolves", "wither_storm_far_loop",
-            "wither_storm_final_boss_theme", "wither_storm_formidibomb_theme", "wither_storm_hurt",
-            "wither_storm_loop", "wither_storm_reactivates", "wither_storm_reviving_theme", "wither_storm_roar",
+            "wither_storm_hurt", "wither_storm_loop", "wither_storm_reactivates", "wither_storm_roar",
             "wither_storm_shoot", "wither_storm_splits", "wither_storm_thump", "wither_storm_tractor_beam",
             "wither_storm_tractor_beam_activate", "wither_storm_tremble",
             "withered_phlegm_block_close", "withered_phlegm_block_open", "withered_symbiont_ambient",
             "withered_symbiont_cast_spell", "withered_symbiont_death", "withered_symbiont_heart_beat",
-            "withered_symbiont_hurt", "withered_symbiont_intense_theme", "withered_symbiont_launch_mob",
+            "withered_symbiont_hurt", "withered_symbiont_launch_mob",
             "withered_symbiont_normal_death", "withered_symbiont_power_down", "withered_symbiont_prepare_spell",
             "withered_symbiont_pull", "withered_symbiont_spawn", "withered_symbiont_step",
-            "withered_symbiont_summon", "withered_symbiont_theme"
+            "withered_symbiont_summon"
     };
 
     private static final Set<String> ITEM_SET =

@@ -3674,8 +3674,7 @@ public final class SickenedEntities {
         }
     }
 
-    public static class WitheredSymbiontEntity extends SickenedMobEntity
-            implements BossThemeProvider {
+    public static class WitheredSymbiontEntity extends SickenedMobEntity {
         private static final DataParameter<Integer> BOSSFIGHT_STAGE = EntityDataManager.createKey(WitheredSymbiontEntity.class, DataSerializers.VARINT);
         private static final DataParameter<String> SPELL_TYPE = EntityDataManager.createKey(WitheredSymbiontEntity.class, DataSerializers.STRING);
         private static final DataParameter<Boolean> NON_BOSS_MODE = EntityDataManager.createKey(WitheredSymbiontEntity.class, DataSerializers.BOOLEAN);
@@ -4319,37 +4318,6 @@ public final class SickenedEntities {
         }
 
         public boolean isNonBossMode() { return dataManager.get(NON_BOSS_MODE); }
-
-        @Override
-        public SoundEvent getBossTheme() {
-            return ModSounds.get(shouldIncreaseDifficulty()
-                    ? "withered_symbiont_intense_theme" : "withered_symbiont_theme");
-        }
-
-        @Override
-        public boolean shouldPlayBossTheme() {
-            return isEntityAlive();
-        }
-
-        @Override
-        public int getBossThemePriority() {
-            return 2;
-        }
-
-        @Override
-        public int getBossThemeFadeTime() {
-            return 120;
-        }
-
-        @Override
-        public double getBossThemeDistance() {
-            return 45.0D;
-        }
-
-        @Override
-        public Vec3d getBossThemePosition() {
-            return getPositionVector();
-        }
 
         public boolean canBeAttackedWhenNotVulnerable() {
             return WitherStormConfig.attackableWhenNotVulnerable;

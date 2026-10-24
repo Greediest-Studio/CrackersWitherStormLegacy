@@ -126,7 +126,7 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 public class WitherStormEntity extends EntityMob
-        implements BossThemeProvider, TractorBeamProvider, WitherStormBase, DistantStormPart {
+        implements TractorBeamProvider, WitherStormBase, DistantStormPart {
 
     public enum PlayDeadState { NORMAL_BEHAVIOR, FALLING, PLAYING_DEAD, REVIVING }
 
@@ -209,7 +209,7 @@ public class WitherStormEntity extends EntityMob
     private final List<UUID> savedTrackedEntities = new ArrayList<UUID>();
     private final Set<UUID> pendingBowelsTransfers = new HashSet<UUID>();
     private final Set<EntityPlayerMP> trackingPlayers = new HashSet<EntityPlayerMP>();
-    private final Map<UUID, Boolean> bossThemeAccess = new LinkedHashMap<UUID, Boolean>();
+    private final Map<UUID, Boolean> bossBarAccess = new LinkedHashMap<UUID, Boolean>();
     private final List<BlockPos> playingJukeboxes = new ArrayList<BlockPos>();
     private List<DebrisCluster> debrisClusters = Collections.emptyList();
     private List<DebrisCluster> hunchbackDebrisClusters = Collections.emptyList();
@@ -1359,16 +1359,13 @@ public class WitherStormEntity extends EntityMob
         boolean commandBlockOverride = commandBlock != null && commandBlock.shouldShowOwnerBossBar();
         boolean shouldShowBossBar = !isPlayDeadAiDisabled() || commandBlockOverride;
         for (EntityPlayerMP player : trackingPlayers) {
-            Boolean cachedAccess = bossThemeAccess.get(player.getUniqueID());
+            Boolean cachedAccess = bossBarAccess.get(player.getUniqueID());
             boolean refreshAccess = cachedAccess == null
                     || Math.floorMod(ticksExisted + player.getEntityId(), 20) == 0;
             boolean hasAccess = !WitherStormConfig.smartBossbar
                     || (!refreshAccess ? cachedAccess.booleanValue()
                     : BossVisibility.canSeeOrIsNotInSmallArea(this, player));
-            Boolean previousAccess = bossThemeAccess.put(player.getUniqueID(), hasAccess);
-            if (previousAccess == null || previousAccess.booleanValue() != hasAccess) {
-                ModNetwork.sendBossThemeAccess(player, this, hasAccess);
-            }
+            bossBarAccess.put(player.getUniqueID(), hasAccess);
             if (shouldShowBossBar && hasAccess) legacyBossInfo.addPlayer(player);
             else legacyBossInfo.removePlayer(player);
         }
@@ -2659,34 +2656,6 @@ public class WitherStormEntity extends EntityMob
     public boolean isResummoned() { return resummoned; }
 
     @Override
-    public SoundEvent getBossTheme() {
-        if (hasRecentlyBeenRevived()) return ModSounds.get("wither_storm_reviving_theme");
-        if (getPhase() == 5 && getConsumedMass() > getConsumptionAmountForPhase(5)) {
-            return ModSounds.get("wither_storm_formidibomb_theme");
-        }
-        return ModSounds.get(isBeingTornApart()
-                ? "wither_storm_bowels_exposed_theme" : "wither_storm_boss_theme");
-    }
-
-    @Override
-    public boolean shouldPlayBossTheme() {
-        SupplementalEntities.CommandBlockEntity commandBlock = getBowelsCommandBlock();
-        boolean commandBlockOverride = commandBlock != null && commandBlock.shouldShowOwnerBossBar();
-        return isEntityAlive() && shouldPlaySoundLoop && !isAIDisabled() && !isSilent()
-                && (!isDeadOrPlayingDead() || commandBlockOverride);
-    }
-
-    @Override
-    public int getBossThemePriority() {
-        return 1;
-    }
-
-    @Override
-    public Vec3d getBossThemePosition() {
-        return getPositionVector();
-    }
-
-    @Override
     public int getBrightnessForRender() {
         return WitherStormPartLogic.applyFadeLight(super.getBrightnessForRender(), getFadeAnimation());
     }
@@ -3677,8 +3646,7 @@ public class WitherStormEntity extends EntityMob
         }
         boolean hasAccess = !WitherStormConfig.smartBossbar
                 || BossVisibility.canSeeOrIsNotInSmallArea(this, player);
-        bossThemeAccess.put(player.getUniqueID(), hasAccess);
-        ModNetwork.sendBossThemeAccess(player, this, hasAccess);
+        bossBarAccess.put(player.getUniqueID(), hasAccess);
         ModNetwork.createDebris(player, this, isDeadOrPlayingDead());
         SupplementalEntities.CommandBlockEntity commandBlock = getBowelsCommandBlock();
         if (commandBlock != null) commandBlock.addOutsideBossBarViewer(player);
@@ -3693,7 +3661,7 @@ public class WitherStormEntity extends EntityMob
                     getEntityId(), getUniqueID(), dimension, player.getName(),
                     System.identityHashCode(player), player.dimension, trackingPlayers.size());
         }
-        if (player != null) bossThemeAccess.remove(player.getUniqueID());
+        if (player != null) bossBarAccess.remove(player.getUniqueID());
         legacyBossInfo.removePlayer(player);
         SupplementalEntities.CommandBlockEntity commandBlock = getBowelsCommandBlock();
         if (commandBlock != null) commandBlock.removeOutsideBossBarViewer(player);

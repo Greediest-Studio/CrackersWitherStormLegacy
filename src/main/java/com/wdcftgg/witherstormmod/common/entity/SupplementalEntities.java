@@ -1501,7 +1501,7 @@ public final class SupplementalEntities {
     }
 
     public static class CommandBlockEntity extends StormPartBase
-            implements BossThemeProvider, IEntityAdditionalSpawnData {
+            implements IEntityAdditionalSpawnData {
         private static final byte HIT_GLARE_STATUS = 15;
         private static final DataParameter<Integer> CORE_STATE =
                 EntityDataManager.createKey(CommandBlockEntity.class, DataSerializers.VARINT);
@@ -2247,32 +2247,6 @@ public final class SupplementalEntities {
         public boolean shouldShowOwnerBossBar() {
             CoreState state = getCoreState();
             return state == CoreState.LURING || state == CoreState.REACTIVATING;
-        }
-
-        @Override
-        public SoundEvent getBossTheme() {
-            return ModSounds.get("wither_storm_final_boss_theme");
-        }
-
-        @Override
-        public boolean shouldPlayBossTheme() {
-            return isEntityAlive() && getHealth() < getMaxHealth()
-                    && getCoreState() == CoreState.BOSSFIGHT;
-        }
-
-        @Override
-        public int getBossThemePriority() {
-            return 3;
-        }
-
-        @Override
-        public int getBossThemeFadeTime() {
-            return 40;
-        }
-
-        @Override
-        public Vec3d getBossThemePosition() {
-            return getPositionVector();
         }
 
         @Override
