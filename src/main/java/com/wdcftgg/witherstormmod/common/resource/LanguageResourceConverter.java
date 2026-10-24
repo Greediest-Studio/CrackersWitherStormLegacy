@@ -31,6 +31,8 @@ final class LanguageResourceConverter {
     private static final Set<String> REMOVED_CONFIG_KEYS = Collections.unmodifiableSet(
             new HashSet<String>(Arrays.asList(
                     "autoSpawnWitherStorm",
+                    "crossbowsSupportEnderPearls",
+                    "customPanorama",
                     "generateSpawnPlatform",
                     "allowSuperBeaconResummoning",
                     "autoSpawnTime",

@@ -6,11 +6,9 @@ import com.wdcftgg.witherstormmod.client.WitherStormClientConfig;
 import com.wdcftgg.witherstormmod.client.WitherStormClientEvents;
 import com.wdcftgg.witherstormmod.common.config.WitherStormConfig;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.common.config.Configuration;
@@ -33,8 +31,6 @@ import java.util.Map;
 
 public final class WitherStormConfigScreen extends GuiScreen {
 
-    private static final ResourceLocation PANORAMA = new ResourceLocation(Tags.MOD_ID,
-            "textures/gui/title/background/panorama_0.png");
     private static final int CATEGORY_CLIENT = 0;
     private static final int CATEGORY_SERVER = 1;
     private static final int CATEGORY_PRESETS = 2;
@@ -224,13 +220,7 @@ public final class WitherStormConfigScreen extends GuiScreen {
     }
 
     private void drawBackground() {
-        if (WitherStormClientConfig.customPanorama) {
-            mc.getTextureManager().bindTexture(PANORAMA);
-            Gui.drawModalRectWithCustomSizedTexture(0, 0, 0, 0, width, height,
-                    width, height);
-        } else {
-            drawBackground(0);
-        }
+        drawBackground(0);
         drawRect(0, 0, width, height, 0x99000000);
     }
 

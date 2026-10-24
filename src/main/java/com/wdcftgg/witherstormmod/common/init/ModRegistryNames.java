@@ -127,7 +127,8 @@ public final class ModRegistryNames {
             "wooden_command_block_",
             "stone_command_block_",
             "iron_command_block_",
-            "gold_command_block_"
+            "gold_command_block_",
+            "crossbow"
     };
 
     public static boolean isRegisteredItem(String id) {
@@ -160,7 +161,8 @@ public final class ModRegistryNames {
         }
         if (name.startsWith("assets/witherstormmod/textures/gui/")) {
             String file = name.substring("assets/witherstormmod/textures/gui/".length());
-            return file.startsWith("super_beacon");
+            return file.startsWith("super_beacon")
+                    || file.startsWith("title/background/panorama_");
         }
         if (name.startsWith("assets/witherstormmod/textures/misc/")) {
             String file = name.substring("assets/witherstormmod/textures/misc/".length());

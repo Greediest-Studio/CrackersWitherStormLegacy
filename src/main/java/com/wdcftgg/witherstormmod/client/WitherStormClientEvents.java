@@ -153,7 +153,6 @@ public final class WitherStormClientEvents {
     public static void registerModels(ModelRegistryEvent event) {
         ModBlocks.registerModels();
         ModItems.registerModels();
-        WitherStormMod.proxy.registerCrossbowModModels();
         WitherStormMod.LOGGER.info("Registered all legacy block and item models during ModelRegistryEvent");
     }
 

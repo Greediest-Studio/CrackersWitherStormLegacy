@@ -12,7 +12,6 @@
     "client.WorldMixin",
     "client.PigRendererMixin",
     "client.ClassicBarHealthRendererMixin",
-    "client.GuiMainMenuPanoramaMixin",
     "client.FutureMcTridentRendererMixin",
     "client.RenderManagerMixin"
   ],

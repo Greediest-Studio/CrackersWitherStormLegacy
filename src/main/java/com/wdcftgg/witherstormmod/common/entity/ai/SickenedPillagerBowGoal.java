@@ -3,6 +3,7 @@ package com.wdcftgg.witherstormmod.common.entity.ai;
 import com.wdcftgg.witherstormmod.common.entity.SickenedEntities;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.init.Items;
 import net.minecraft.util.math.MathHelper;
 
 
@@ -11,7 +12,7 @@ import net.minecraft.util.math.MathHelper;
 
 
 
-public final class SickenedPillagerCrossbowGoal extends EntityAIBase {
+public final class SickenedPillagerBowGoal extends EntityAIBase {
     private static final int CHARGE_TICKS = 25;
 
     private final SickenedEntities.SickenedPillagerEntity pillager;
@@ -21,8 +22,8 @@ public final class SickenedPillagerCrossbowGoal extends EntityAIBase {
     private int chargeTicks;
     private int seeTime;
 
-    public SickenedPillagerCrossbowGoal(SickenedEntities.SickenedPillagerEntity pillager,
-                                        int attackInterval, float maximumAttackDistance) {
+    public SickenedPillagerBowGoal(SickenedEntities.SickenedPillagerEntity pillager,
+                                   int attackInterval, float maximumAttackDistance) {
         this.pillager = pillager;
         this.attackInterval = attackInterval;
         this.maximumAttackDistance = maximumAttackDistance;
@@ -32,7 +33,8 @@ public final class SickenedPillagerCrossbowGoal extends EntityAIBase {
     @Override
     public boolean shouldExecute() {
         EntityLivingBase target = pillager.getAttackTarget();
-        return target != null && target.isEntityAlive() && pillager.isHoldingCrossbow();
+        return target != null && target.isEntityAlive()
+                && pillager.getHeldItemMainhand().getItem() == Items.BOW;
     }
 
     @Override

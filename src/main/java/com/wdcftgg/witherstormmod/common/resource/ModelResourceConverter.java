@@ -22,10 +22,6 @@ final class ModelResourceConverter {
 
     private static final String MODEL_PREFIX = "assets/witherstormmod/models/";
     private static final String BLOCKSTATE_PREFIX = "assets/witherstormmod/blockstates/";
-    private static final String CROSSBOW_MOD_ENDER_PEARL_MODEL =
-            MODEL_PREFIX + "item/crossbow_mod_ender_pearl.json";
-    private static final String CROSSBOW_ENDER_PEARL_SOURCE =
-            MODEL_PREFIX + "item/crossbow_ender_pearl.json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Map<String, String> PARENT_REWRITES;
     private static final Map<String, Scale> PADDED_TEXTURES;
@@ -88,9 +84,6 @@ final class ModelResourceConverter {
         if (!handles(legacyName)) {
             return legacyName;
         }
-        if (CROSSBOW_MOD_ENDER_PEARL_MODEL.equals(legacyName)) {
-            return CROSSBOW_ENDER_PEARL_SOURCE;
-        }
         return legacyName;
     }
 
@@ -99,12 +92,6 @@ final class ModelResourceConverter {
             JsonObject root = JsonParser.parseString(
                     new String(source, StandardCharsets.UTF_8)).getAsJsonObject();
             if (legacyName.startsWith(MODEL_PREFIX)) {
-                if (CROSSBOW_MOD_ENDER_PEARL_MODEL.equals(legacyName)) {
-                    root.addProperty("parent", "crossbow:block/template");
-                    JsonObject textures = getOrCreateObject(root, "textures");
-                    textures.addProperty(
-                            "layer0", "witherstormmod:items/crossbow_mod_ender_pearl");
-                }
                 convertModel(root);
             } else {
                 root = convertBlockState(legacyName, root);
@@ -419,15 +406,6 @@ final class ModelResourceConverter {
         JsonObject root = new JsonObject();
         root.add(key, value);
         return root;
-    }
-
-    private static JsonObject getOrCreateObject(JsonObject root, String key) {
-        JsonObject value = object(root.get(key));
-        if (value == null) {
-            value = new JsonObject();
-            root.add(key, value);
-        }
-        return value;
     }
 
     private static JsonObject object(JsonElement value) {

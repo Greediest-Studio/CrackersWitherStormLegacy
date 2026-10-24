@@ -29,7 +29,6 @@
 - Minecraft 1.12.2
 - CleanroomLoader 0.6.6-alpha及以上
 - Future MC（可选）
-- Crossbow（可选）
 - JEI（可选）
 
 ## 部分问题

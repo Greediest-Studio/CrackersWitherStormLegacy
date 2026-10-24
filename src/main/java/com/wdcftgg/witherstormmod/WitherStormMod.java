@@ -6,7 +6,6 @@ import com.wdcftgg.witherstormmod.api.common.ai.witherstorm.WitherStormWorldInte
 import com.wdcftgg.witherstormmod.common.capability.WitherSicknessCapability;
 import com.wdcftgg.witherstormmod.common.command.WitherStormAdminCommand;
 import com.wdcftgg.witherstormmod.common.command.WitherStormSelectorHandler;
-import com.wdcftgg.witherstormmod.common.compat.CrossbowCompatibilityBootstrap;
 import com.wdcftgg.witherstormmod.common.init.ModBlocks;
 import com.wdcftgg.witherstormmod.common.init.ModAttributes;
 import com.wdcftgg.witherstormmod.common.init.ModCreatureAttributes;
@@ -32,7 +31,6 @@ import com.wdcftgg.witherstormmod.common.world.BowelsDimensions;
 import com.wdcftgg.witherstormmod.common.world.ChunkLoadingManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
@@ -42,13 +40,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import com.cleanroommc.assetmover.AssetMoverAPI;
-import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION,
-        dependencies = "required-after:futuremc;required-after:crossbow;required-after:assetmover",
+        dependencies = "required-after:futuremc",
         guiFactory = "com.wdcftgg.witherstormmod.client.config.WitherStormGuiFactory")
 public class WitherStormMod {
 
@@ -57,18 +51,6 @@ public class WitherStormMod {
 
     @Mod.Instance(Tags.MOD_ID)
     public static WitherStormMod INSTANCE;
-
-    public WitherStormMod() {
-        if (FMLCommonHandler.instance().getSide() != Side.CLIENT) return;
-        Map<String, String> panoramaAssets = new HashMap<String, String>();
-        for (int face = 1; face <= 5; face++) {
-            String path = "assets/minecraft/textures/gui/title/background/panorama_" + face + ".png";
-            panoramaAssets.put(path, path);
-        }
-
-
-        AssetMoverAPI.fromMinecraft("1.20.1", panoramaAssets);
-    }
 
     @SidedProxy(
             clientSide = "com.wdcftgg.witherstormmod.common.proxy.ClientProxy",
@@ -84,7 +66,6 @@ public class WitherStormMod {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         WitherStormSelectorHandler.register();
-        CrossbowCompatibilityBootstrap.register();
         try {
             UpstreamResourceArchive.initialize(event.getModConfigurationDirectory().getParentFile());
         } catch (java.io.IOException exception) {

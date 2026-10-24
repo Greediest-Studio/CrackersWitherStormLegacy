@@ -9,7 +9,7 @@ import net.minecraft.util.math.MathHelper;
 
 public class SickenedIllagerModel extends ModelBase {
 
-    private final boolean crossbowPose;
+    private final boolean rangedPose;
     private final ModelRenderer head;
     private final ModelRenderer body;
     private final ModelRenderer arms;
@@ -18,8 +18,8 @@ public class SickenedIllagerModel extends ModelBase {
     private final ModelRenderer rightLeg;
     private final ModelRenderer leftLeg;
 
-    public SickenedIllagerModel(boolean crossbowPose) {
-        this.crossbowPose = crossbowPose;
+    public SickenedIllagerModel(boolean rangedPose) {
+        this.rangedPose = rangedPose;
         textureWidth = 64;
         textureHeight = 64;
         head = new ModelRenderer(this, 0, 0);
@@ -58,7 +58,7 @@ public class SickenedIllagerModel extends ModelBase {
         setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, entity);
         head.render(scale);
         body.render(scale);
-        if (!crossbowPose && !isAggressive(entity)) {
+        if (!rangedPose && !isAggressive(entity)) {
             arms.render(scale);
         } else {
             rightArm.render(scale);
@@ -83,7 +83,7 @@ public class SickenedIllagerModel extends ModelBase {
         arms.rotationPointY = 3.0F;
         arms.rotationPointZ = -1.0F;
         arms.rotateAngleX = -0.75F;
-        if (crossbowPose) {
+        if (rangedPose) {
 
             float relax = entity instanceof SickenedEntities.SickenedPillagerEntity
                     && ((SickenedEntities.SickenedPillagerEntity) entity).isCharging() ? 0.0F : 0.35F;

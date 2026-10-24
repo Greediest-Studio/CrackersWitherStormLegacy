@@ -101,10 +101,6 @@ public final class WitherStormClientConfig {
     @Config.Comment("风暴被撕裂时是否渲染脉冲方块效果。")
     public static boolean renderPulse = true;
 
-    @Config.Name("customPanorama")
-    @Config.Comment("是否启用本模组添加的自定义主菜单全景。")
-    public static boolean customPanorama = true;
-
     @Config.Name("aprilFools")
     @Config.Comment("是否启用愚人节粉色风暴和心形粒子效果。")
     public static boolean aprilFools = true;

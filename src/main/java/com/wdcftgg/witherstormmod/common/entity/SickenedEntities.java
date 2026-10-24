@@ -5,7 +5,7 @@ import com.wdcftgg.witherstormmod.api.common.ai.symbiont.SymbiontSpell;
 import com.wdcftgg.witherstormmod.api.common.registry.WitherStormModRegistries;
 import com.wdcftgg.witherstormmod.WitherStormMod;
 import com.wdcftgg.witherstormmod.common.config.WitherStormConfig;
-import com.wdcftgg.witherstormmod.common.entity.ai.SickenedPillagerCrossbowGoal;
+import com.wdcftgg.witherstormmod.common.entity.ai.SickenedPillagerBowGoal;
 import com.wdcftgg.witherstormmod.common.init.ModBlocks;
 import com.wdcftgg.witherstormmod.common.init.ModItems;
 import com.wdcftgg.witherstormmod.common.init.ModSounds;
@@ -146,9 +146,6 @@ import java.util.UUID;
 public final class SickenedEntities {
 
     private static final ResourceLocation FUTURE_MC_TRIDENT = new ResourceLocation("futuremc", "trident");
-    private static final ResourceLocation CROSSBOW_ID = new ResourceLocation("crossbow", "crossbow");
-    private static final ResourceLocation CROSSBOW_SHOOT_SOUND =
-            new ResourceLocation("crossbow", "items.crossbow.shoot");
 
     private SickenedEntities() {
     }
@@ -1876,11 +1873,7 @@ public final class SickenedEntities {
         public SickenedPillagerEntity(World world) {
             super(world);
             setSize(0.6F, 1.95F);
-
-
-            Item crossbow = ForgeRegistries.ITEMS.getValue(CROSSBOW_ID);
-            setItemStackToSlot(EntityEquipmentSlot.MAINHAND,
-                    new ItemStack(crossbow != null ? crossbow : Items.BOW));
+            setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
         }
         @Override protected double getSickenedHealth() { return 30.0D; }
         @Override protected double getSickenedSpeed() { return 0.37D; }
@@ -1898,7 +1891,7 @@ public final class SickenedEntities {
         @Override
         protected void initEntityAI() {
             tasks.addTask(1, new EntityAISwimming(this));
-            tasks.addTask(2, new SickenedPillagerCrossbowGoal(this, 20, 15.0F));
+            tasks.addTask(2, new SickenedPillagerBowGoal(this, 20, 15.0F));
             tasks.addTask(5, new EntityAIWanderAvoidWater(this, 0.8D));
             tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
             tasks.addTask(6, new EntityAILookIdle(this));
@@ -1909,13 +1902,7 @@ public final class SickenedEntities {
 
         @Override
         public void attackEntityWithRangedAttack(EntityLivingBase target, float distanceFactor) {
-            fireSickenedCrossbowBolt(this, target, distanceFactor);
-        }
-
-
-        public boolean isHoldingCrossbow() {
-            Item crossbow = ForgeRegistries.ITEMS.getValue(CROSSBOW_ID);
-            return crossbow != null && getHeldItemMainhand().getItem() == crossbow;
+            fireSickenedPillagerArrow(this, target, distanceFactor);
         }
 
 
@@ -1925,6 +1912,14 @@ public final class SickenedEntities {
 
         public void setCharging(boolean charging) {
             dataManager.set(CHARGING, charging);
+        }
+
+        @Override
+        public void readEntityFromNBT(NBTTagCompound compound) {
+            super.readEntityFromNBT(compound);
+            if (getHeldItemMainhand().isEmpty()) {
+                setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+            }
         }
 
         @Override public void setSwingingArms(boolean swingingArms) { }
@@ -4790,7 +4785,7 @@ public final class SickenedEntities {
     }
 
 
-    private static void fireSickenedCrossbowBolt(SickenedMobEntity shooter, EntityLivingBase target,
+    private static void fireSickenedPillagerArrow(SickenedMobEntity shooter, EntityLivingBase target,
                                                   float distanceFactor) {
         EntityTippedArrow arrow = new EntityTippedArrow(shooter.world, shooter);
         double dx = target.posX - shooter.posX;
@@ -4805,9 +4800,7 @@ public final class SickenedEntities {
         int punch = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH, weapon);
         if (punch > 0) arrow.setKnockbackStrength(punch);
         if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, weapon) > 0) arrow.setFire(100);
-        SoundEvent shootSound = ForgeRegistries.SOUND_EVENTS.getValue(CROSSBOW_SHOOT_SOUND);
-        shooter.playSound(shootSound != null ? shootSound : SoundEvents.ENTITY_SKELETON_SHOOT,
-                1.0F, 1.0F);
+        shooter.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F);
         shooter.world.spawnEntity(arrow);
     }
 

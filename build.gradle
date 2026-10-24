@@ -88,9 +88,6 @@ unimined.minecraft {
 }
 
 dependencies {
-    if (use_asset_mover.toBoolean()) {
-        implementation "com.cleanroommc:assetmover:${asset_mover_version}"
-    }
     if (enable_junit_testing.toBoolean()) {
         testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
         testImplementation 'com.google.code.gson:gson:2.10.1'

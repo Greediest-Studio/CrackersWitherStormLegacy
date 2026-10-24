@@ -187,10 +187,6 @@ public final class WitherStormConfig {
     @Config.Comment("进入肠道维度时是否在结构外围寻找随机安全入口；关闭后使用固定结构入口。")
     public static boolean randomBowelsEntrance = true;
 
-    @Config.Name("crossbowsSupportEnderPearls")
-    @Config.Comment("Crossbow 弩是否可以从主手或副手装填并发射末影珍珠。")
-    public static boolean crossbowsSupportEnderPearls = true;
-
     @Config.Name("bowelsFallResistance")
     @Config.Comment("离开肠道并从高处落下时是否短暂获得最高等级抗性。")
     public static boolean bowelsFallResistance = true;

@@ -32,7 +32,7 @@ final class WitherStormConfigCommandSupport {
                 "tillShouldShowHole", "shouldShowHole", "rotationSpeed",
                 "witherStormInvulnerability", "smartBossbar", "randomBowelsEntrance",
                 "summoningDimensionListMode",
-                "crossbowsSupportEnderPearls", "preventWitherStormCamping",
+                "preventWitherStormCamping",
                 "bowelsFallResistance", "canAttackHeads",
                 "endOfPhaseFiveBombableExclusively",
                 "shouldPlayGlobalSoundsCrossDimensionally", "onlyTryPickingUpTractorTagged",
